@@ -10,7 +10,6 @@ from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-# conda install tensorflowjs
 import tensorflowjs as tfjs
 import os
 
