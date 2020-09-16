@@ -10,7 +10,6 @@ from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.callbacks import ModelCheckpoint
 
-# conda install tensorflowjs
 import tensorflowjs as tfjs
 import os
 
@@ -85,8 +84,9 @@ plt.plot(history.history['loss'], label='train')
 plt.plot(history.history['val_loss'], label='validation')
 plt.xlabel('epochs')
 plt.ylabel('mean_squared_logarithmic_error')
+plt.legend()
 plt.show()
 
-convert_to_js_model('hello_mlp.h5')
+convert_to_js_model('hello_mlp.h5', dest='./hello_tensorflow_app/model')
 
 # now we are ready to deploy to node.js
