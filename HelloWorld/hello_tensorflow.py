@@ -4,7 +4,7 @@
 import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
-import pickle
+import json
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Dense
@@ -21,9 +21,10 @@ def clean(text: str):
 model_artifacts = dict()
 
 
-def save(key_values: dict):
+def save(key_values: dict, dest='model_artifacts.json'):
     model_artifacts.update(key_values)
-    pickle.dump(model_artifacts, open('model_artifacts.pkl', 'wb'))
+    with open(dest, 'w') as f:
+        json.dump(model_artifacts, f)
 
 
 def convert_to_js_model(model_h5: str, dest='tfjs_artifacts'):
@@ -36,7 +37,7 @@ def convert_to_js_model(model_h5: str, dest='tfjs_artifacts'):
 
 
 # Import the stock price data
-df = pd.read_csv('./HistoricalQuotes_TSLA.csv', sep=', ', index_col=0, parse_dates=True)
+df = pd.read_csv('./HistoricalQuotes_TSLA.csv', sep=', ', index_col=0, parse_dates=True, engine='python')
 
 df['Close/Last'] = pd.to_numeric(df['Close/Last'].apply(clean))
 print(df['Close/Last'].head())
@@ -50,19 +51,13 @@ print(df_windowed.head())
 # Train test split
 features = df_windowed.columns[:-1]
 target = df_windowed.columns[-1]
-X = df_windowed.loc[:, features]
-y = df_windowed.loc[:, target]
+X = df_windowed.loc[:, features].values
+y = df_windowed.loc[:, target].values
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-# scale
-X_min = tf.reduce_min(X_train)
-X_max = tf.reduce_max(X_train)
-
-X_train = (X_train.values - X_min) / (X_max - X_min)
-X_test = (X_test.values - X_min) / (X_max - X_min)
-
 # save for deployment
-save({'X_min': X_min, 'X_max': X_max})
+save({'X_test': X_test.tolist(), 'y_test': y_test.tolist()},
+     dest='./hello_tensorflow_app/model_artifacts.json')
 
 # create tensorflow model
 model_input = Input(shape=(window_size,))
@@ -72,9 +67,9 @@ model = Model(model_input, x)
 print(model.summary())
 
 # compile
-model.compile(optimizer='adam', loss='mean_squared_logarithmic_error')
+model.compile(optimizer='adam', loss='mse')
 
-mc = ModelCheckpoint('hello_mlp.h5')
+mc = ModelCheckpoint('hello_mlp.h5', save_best_only=True)
 history = model.fit(X_train, y_train, epochs=30, batch_size=32,
                     validation_data=(X_test, y_test),
                     callbacks=[mc])
@@ -83,7 +78,7 @@ history = model.fit(X_train, y_train, epochs=30, batch_size=32,
 plt.plot(history.history['loss'], label='train')
 plt.plot(history.history['val_loss'], label='validation')
 plt.xlabel('epochs')
-plt.ylabel('mean_squared_logarithmic_error')
+plt.ylabel('mse')
 plt.legend()
 plt.show()
 
