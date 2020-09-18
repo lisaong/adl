@@ -4,6 +4,9 @@ cachetools==4.1.1
 certifi==2020.6.20
 chardet==3.0.4
 cycler==0.10.0
+datasets==1.0.1
+dill==0.3.2
+filelock==3.0.12
 gast==0.3.3
 google-auth==1.21.1
 google-auth-oauthlib==0.4.1
@@ -23,6 +26,7 @@ pandas==1.1.2
 Pillow==7.2.0
 prompt-toolkit==1.0.14
 protobuf==3.13.0
+pyarrow==1.0.1
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 Pygments==2.7.0
@@ -46,8 +50,10 @@ tensorflow-hub==0.7.0
 tensorflowjs==2.3.0
 termcolor==1.1.0
 threadpoolctl==2.1.0
+tqdm==4.49.0
 urllib3==1.25.10
 wcwidth==0.2.5
 Werkzeug==1.0.1
 wincertstore==0.2
 wrapt==1.12.1
+xxhash==2.0.0
