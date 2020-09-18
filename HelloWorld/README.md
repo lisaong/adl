@@ -30,4 +30,4 @@ node app.js
 
 5. Go to http://localhost:3000
 
-![example](https://github.com/lisaong/adl/raw/readme/HelloWorld/example.png)
+![example](https://github.com/lisaong/adl/raw/master/HelloWorld/example.png)
