@@ -6,9 +6,10 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense
+from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.metrics import Precision, Recall
 from nltk import word_tokenize
 import pickle
 
@@ -67,27 +68,31 @@ save_artifacts({'label_encoder': le})
 # define our model
 vocab_len = len(vectorizer.get_vocabulary())
 embedding_len = 50
+num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
 x = Embedding(vocab_len, embedding_len, input_length=sequence_len)(model_input)
-x = GRU(16, activation='tanh', return_sequences=True)(x)
-x = GRU(16, activation='tanh')(x)
+x = GRU(32, activation='relu', recurrent_dropout=.5, return_sequences=True)(x)
+x = GRU(32, activation='relu', recurrent_dropout=.5)(x)
 x = Flatten()(x)
-x = Dense(16, activation='relu')(x)
-x = Dense(len(le.classes_), activation='softmax')(x)
+x = Dense(num_classes*2, activation='relu')(x)
+x = Dropout(.5)(x)
+x = Dense(num_classes, activation='softmax')(x)
 model = Model(model_input, x)
 model.summary()
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
-mc = ModelCheckpoint('gru.h5', monitor='val_loss', save_best_only=True)
+model.compile(optimizer='adam', loss='categorical_crossentropy',
+              metrics=['acc', Precision(), Recall()])
 
-history = model.fit(X_train, y_train, epochs=20,
+mc = ModelCheckpoint('gru.h5', monitor='val_acc', save_best_only=True)
+
+history = model.fit(X_train, y_train, epochs=30, batch_size=32, shuffle=True,
                     validation_data=(X_val, y_val),
                     callbacks=[mc])
 
-plt.plot(history.history['loss'], label='train')
-plt.plot(history.history['val_loss'], label='validation')
+plt.plot(history.history['acc'], label='train')
+plt.plot(history.history['val_acc'], label='validation')
 plt.title('Learning Curve')
 plt.xlabel('epochs')
-plt.ylabel('loss')
+plt.ylabel('accuracy')
 plt.legend()
 plt.show()
