@@ -93,7 +93,7 @@ model.compile(optimizer='adam', loss='categorical_crossentropy',
 mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'lstm.h5'),
                      monitor='val_acc', save_best_only=True)
 
-history = model.fit(X_train, y_train, epochs=20, batch_size=16, shuffle=True,
+history = model.fit(X_train, y_train, epochs=20, batch_size=32, shuffle=True,
                     validation_data=(X_val, y_val),
                     callbacks=[mc])
 
