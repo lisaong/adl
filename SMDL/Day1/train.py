@@ -17,7 +17,7 @@ import os
 
 # globals
 MODEL_ARTIFACTS = dict()
-MODEL_DIR = 'model'
+MODEL_DIR = os.path.join('app', 'model')
 if not os.path.exists(MODEL_DIR):
     os.mkdir(MODEL_DIR)
 
@@ -75,7 +75,7 @@ save_artifacts({'label_encoder': le})
 
 # define our model
 vocab_len = len(vectorizer.get_vocabulary())
-embedding_len = 50
+embedding_len = 75
 num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
 x = Embedding(vocab_len, embedding_len, input_length=sequence_len)(model_input)
