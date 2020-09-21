@@ -31,6 +31,7 @@ sequence_len = int(df_train['prompt'].apply(lambda x: len(word_tokenize(x))).med
 print(f'Sequence length: {sequence_len}')
 
 # visualise the imbalance
+plt.title('Label Counts')
 plt.hist(df_train['context'], label='train')
 plt.xticks(rotation=45, ha='right')
 plt.hist(df_val['context'], label='validation')
@@ -79,12 +80,13 @@ model.summary()
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 mc = ModelCheckpoint('gru.h5', monitor='val_loss', save_best_only=True)
 
-history = model.fit(X_train, y_train, epochs=5,
+history = model.fit(X_train, y_train, epochs=20,
                     validation_data=(X_val, y_val),
                     callbacks=[mc])
 
 plt.plot(history.history['loss'], label='train')
 plt.plot(history.history['val_loss'], label='validation')
+plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('loss')
 plt.legend()
