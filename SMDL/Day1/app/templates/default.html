@@ -1,8 +1,16 @@
 <html>
     <body>
         <div >
-            <h1 style="text-align: center"> Welcome to the homepage! </h1>
-            <hr>
+            <h1 style="text-align: center"> Welcome! </h1>
+
+            Type a text to get the sentiment classification
+
+            <form method="POST" action="/">
+                {{ form.hidden_tag() }}
+                {{ form.name.label }} {{ form.name(size=20) }}
+                <input type="submit" value="Go">
+            </form>
+
         </div>
     </body>
 </html>
