@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Input, Embedding, LSTM, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
@@ -75,8 +75,7 @@ embedding_len = 50
 num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
 x = Embedding(vocab_len, embedding_len, input_length=sequence_len)(model_input)
-x = GRU(32, activation='relu', recurrent_dropout=.5, return_sequences=True)(x)
-x = GRU(32, activation='relu', recurrent_dropout=.5)(x)
+x = LSTM(16, activation='relu', recurrent_dropout=.5)(x)
 x = Flatten()(x)
 x = Dense(num_classes*2, activation='relu')(x)
 x = Dropout(.5)(x)
@@ -87,10 +86,10 @@ model.summary()
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['acc', Precision(), Recall()])
 
-mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'gru.h5'),
+mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'lstm.h5'),
                      monitor='val_acc', save_best_only=True)
 
-history = model.fit(X_train, y_train, epochs=30, batch_size=32, shuffle=True,
+history = model.fit(X_train, y_train, epochs=20, batch_size=16, shuffle=True,
                     validation_data=(X_val, y_val),
                     callbacks=[mc])
 
