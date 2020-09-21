@@ -7,9 +7,10 @@ from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.layers import Input, Embedding, LSTM, Flatten, Dense, Dropout
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
+from sklearn.metrics import classification_report
 from nltk import word_tokenize
 import pickle
 import os
@@ -28,8 +29,11 @@ def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
 
 df_train = pd.read_csv('./empathetic_dialogues_train.csv', index_col=0)
 print(df_train.head())
+print(df_train.info())
+
 df_val = pd.read_csv('./empathetic_dialogues_val.csv', index_col=0)
 print(df_val.head())
+print(df_val.info())
 
 # compute median length of the text
 sequence_len = int(df_train['prompt'].apply(lambda x: len(word_tokenize(x))).median())
@@ -75,9 +79,9 @@ embedding_len = 50
 num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
 x = Embedding(vocab_len, embedding_len, input_length=sequence_len)(model_input)
-x = LSTM(16, activation='relu', recurrent_dropout=.5)(x)
+x = LSTM(16, activation='tanh', recurrent_dropout=.5)(x)
 x = Flatten()(x)
-x = Dense(num_classes*2, activation='relu')(x)
+x = Dense(num_classes, activation='relu')(x)
 x = Dropout(.5)(x)
 x = Dense(num_classes, activation='softmax')(x)
 model = Model(model_input, x)
@@ -100,3 +104,10 @@ plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
+
+# get metrics
+best_model = load_model(os.path.join(MODEL_DIR, 'lstm.h5'))
+y_pred_train = best_model.predict(X_train)
+y_pred_val = best_model.predict(X_val)
+print(classification_report(y_train.argmax(axis=1), y_pred_train.argmax(axis=1)))
+print(classification_report(y_val.argmax(axis=1), y_pred_val.argmax(axis=1)))
