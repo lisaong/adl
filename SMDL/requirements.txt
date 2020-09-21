@@ -8,6 +8,7 @@ cycler==0.10.0
 datasets==1.0.1
 dill==0.3.2
 filelock==3.0.12
+Flask==1.1.2
 gast==0.3.3
 google-auth==1.21.1
 google-auth-oauthlib==0.4.1
@@ -15,10 +16,13 @@ google-pasta==0.2.0
 grpcio==1.32.0
 h5py==2.10.0
 idna==2.10
+itsdangerous==1.1.0
+Jinja2==2.11.2
 joblib==0.16.0
 Keras-Preprocessing==1.1.2
 kiwisolver==1.2.0
 Markdown==3.2.2
+MarkupSafe==1.1.1
 matplotlib==3.3.2
 nltk==3.5
 numpy==1.18.5
