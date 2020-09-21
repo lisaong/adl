@@ -12,14 +12,18 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
 from nltk import word_tokenize
 import pickle
+import os
 
 # globals
 MODEL_ARTIFACTS = dict()
+MODEL_DIR = 'model'
+if not os.path.exists(MODEL_DIR):
+    os.mkdir(MODEL_DIR)
 
 
 def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
     MODEL_ARTIFACTS.update(key_values)
-    pickle.dump(MODEL_ARTIFACTS, open(dest, 'wb'))
+    pickle.dump(MODEL_ARTIFACTS, open(os.path.join(MODEL_DIR, dest), 'wb'))
 
 
 df_train = pd.read_csv('./empathetic_dialogues_train.csv', index_col=0)
@@ -83,7 +87,8 @@ model.summary()
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['acc', Precision(), Recall()])
 
-mc = ModelCheckpoint('gru.h5', monitor='val_acc', save_best_only=True)
+mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'gru.h5'),
+                     monitor='val_acc', save_best_only=True)
 
 history = model.fit(X_train, y_train, epochs=30, batch_size=32, shuffle=True,
                     validation_data=(X_val, y_val),
