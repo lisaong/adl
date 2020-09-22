@@ -18,8 +18,7 @@ import os
 # globals
 MODEL_ARTIFACTS = dict()
 MODEL_DIR = os.path.join('app', 'demo', 'model')
-if not os.path.exists(MODEL_DIR):
-    os.mkdir(MODEL_DIR)
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 
 def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
