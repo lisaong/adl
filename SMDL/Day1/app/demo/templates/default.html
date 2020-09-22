@@ -1,7 +1,11 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-	<script src="static/default.js"></script>
 	<link rel="stylesheet" href="static/styles.css" type="text/css" />
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="static/default.js"></script>
 </head>
 
 <body>
@@ -24,11 +28,11 @@
 	</div>
 </div>
 
-<form method="POST" action="/">
-    {{ form.hidden_tag() }}
-    {{ form.reply.label }} {{ form.reply() }}
-    <input type="submit" value="Go">
-</form>
+<div id="form-container">
+	<form id="form-reply" role="form">
+		<input type="text" id="form-reply-input" name="reply" class="chat_input" required autofocus>
+	</form>
+ </div>
 
 </body>
 </html>

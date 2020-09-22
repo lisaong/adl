@@ -40,12 +40,8 @@ body {
     font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
 }
 
-input[type~="text"] {
+.chat_input {
     margin: 2px;
-    width: 400px;
-    height: 30px;
-}
-
-input[type~="submit"] {
+    width: 490px;
     height: 30px;
 }
