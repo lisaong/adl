@@ -26,7 +26,7 @@
 
 <form method="POST" action="/">
     {{ form.hidden_tag() }}
-    {{ form.name.label }} {{ form.name(size=52) }}
+    {{ form.name.label }} {{ form.name() }}
     <input type="submit" value="Go">
 </form>
 
