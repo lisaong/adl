@@ -3,16 +3,18 @@
 # https://www.tensorflow.org/tutorials/text/text_generation
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.layers import Input, Embedding, LSTM, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.metrics import Precision, Recall
 from sklearn.metrics import classification_report
-from nltk import word_tokenize
+from sklearn.model_selection import train_test_split
 import pickle
 import os
+import json
 
 # globals
 MODEL_ARTIFACTS = dict()
@@ -25,16 +27,43 @@ def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
     pickle.dump(MODEL_ARTIFACTS, open(os.path.join(MODEL_DIR, dest), 'wb'))
 
 
+# we'll just use the training set for this task because we are predicting
+# the next word (generating our own target).
 df_train = pd.read_csv('../Day1/empathetic_dialogues_train.csv', index_col=0)
 print(df_train.head())
 print(df_train.info())
 
-df_val = pd.read_csv('../Day1/empathetic_dialogues_val.csv', index_col=0)
-print(df_val.head())
-print(df_val.info())
+# vectorize the text, but without padding
+# we will pad later on after we've generated the input and next-word (target) sequences
+# this allows us to perform pre-padding for shorter input sequences
+tokenizer = Tokenizer(num_words=20000, lower=True)
+tokenizer.fit_on_texts(df_train['utterance'].values)
 
-# compute median length of the text
-sequence_len = int(df_train['utterance'].apply(lambda x: len(word_tokenize(x))).median())
-print(f'Sequence length: {sequence_len}')
+sequences = tokenizer.texts_to_sequences(df_train['utterance'].values)
 
-# vectorize the text
+# compute the median length
+sequence_len = int(np.median(np.array([len(s) for s in sequences])))
+print(sequence_len)
+
+# create our dataset
+# X: sequence_len (sliding window)
+# y: next word
+
+X = []
+y = []
+for s in sequences:
+    if len(s) > sequence_len:
+        for j in range(len(s) - sequence_len):
+            X.append(np.array(s[j:j+sequence_len]))
+            y.append(s[j+sequence_len])
+
+X_train, X_val, y_train, y_val = train_test_split(np.array(X), np.array(y))
+print(X_train.shape, X_val.shape, y_train.shape, y_val.shape)
+
+
+# save our tokenizer configuration
+tokenizer_config = json.loads(tokenizer.to_json())
+save_artifacts({'tokenizer_config': tokenizer_config})
+
+# save some starter texts for later usage
+save_artifacts({'starter_texts': X_train[:50]})
