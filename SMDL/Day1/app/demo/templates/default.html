@@ -1,16 +1,34 @@
 <html>
-    <body>
-        <div >
-            <h1 style="text-align: center"> Welcome! </h1>
+<head>
+	<script src="static/default.js"></script>
+	<link rel="stylesheet" href="static/styles.css" type="text/css" />
+</head>
 
-            Type a text to get the sentiment classification
+<body>
 
-            <form method="POST" action="/">
-                {{ form.hidden_tag() }}
-                {{ form.name.label }} {{ form.name(size=20) }}
-                <input type="submit" value="Go">
-            </form>
+<div id="container" style="border:1px solid #cccccc; overflow:auto;">
+	<div class="msg msg_left">
+		<span class="user1 msg_left_content">Hello! How are you?</span>
+	</div>
+	<div class="msg msg_right">
+		<span class="user2 msg_right_content">Hey! It has been a long while! How has it been for you?</span>
+	</div>
+	<div class="msg msg_left">
+		<span class="user1 msg_left_content">I wonder if you are free for lunch this Thur? You can ask Kate to come along if you want.</span>
+	</div>
+	<div class="msg msg_right">
+		<span class="user2 msg_right_content">Sure, let me ask her.</span>
+	</div>
+	<div class="msg msg_right">
+		<span class="user2 msg_right_content">She just checked back. She's okay to join us!</span>
+	</div>
+</div>
 
-        </div>
-    </body>
+<form method="POST" action="/">
+    {{ form.hidden_tag() }}
+    {{ form.name.label }} {{ form.name(size=52) }}
+    <input type="submit" value="Go">
+</form>
+
+</body>
 </html>
