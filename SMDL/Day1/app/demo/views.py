@@ -16,4 +16,4 @@ def reply_chat():
     text = request.form['reply']
     predictions = model.predict(text)
     print(predictions)
-    return json.dumps({'response': predictions})
+    return json.dumps({'predictions': predictions})
