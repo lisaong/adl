@@ -17,7 +17,7 @@ import os
 
 # globals
 MODEL_ARTIFACTS = dict()
-MODEL_DIR = os.path.join('app', 'model')
+MODEL_DIR = os.path.join('app', 'demo', 'model')
 if not os.path.exists(MODEL_DIR):
     os.mkdir(MODEL_DIR)
 
