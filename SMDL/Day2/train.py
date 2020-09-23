@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Input, Embedding, LSTM, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
@@ -45,25 +46,28 @@ sequences = tokenizer.texts_to_sequences(df_train['utterance'].values)
 sequence_len = int(np.median(np.array([len(s) for s in sequences])))
 print(sequence_len)
 
+# pad sequences to 1.25 * sequence_len
+# 125% is a heuristic - we don't want too much pre-paddings, but we also want the
+# sequences to extend a bit beyond the window size, so that we have enough to predict
+# the next word.
+padded_len = int(sequence_len*1.25)
+print(padded_len)
+sequences = pad_sequences(sequences, maxlen=padded_len, padding='pre')
+
 # create our dataset
 # X: sequence_len (sliding window)
 # y: next word
-
 X = []
 y = []
 for s in sequences:
-    if len(s) > sequence_len:
-        for j in range(len(s) - sequence_len):
-            X.append(np.array(s[j:j+sequence_len]))
-            y.append(s[j+sequence_len])
+    for j in range(len(s) - sequence_len):
+        X.append(np.array(s[j:j+sequence_len]))
+        y.append(s[j+sequence_len])
 
 X_train, X_val, y_train, y_val = train_test_split(np.array(X), np.array(y))
 print(X_train.shape, X_val.shape, y_train.shape, y_val.shape)
-
 
 # save our tokenizer configuration
 tokenizer_config = json.loads(tokenizer.to_json())
 save_artifacts({'tokenizer_config': tokenizer_config})
 
-# save some starter texts for later usage
-save_artifacts({'starter_texts': X_train[:50]})
