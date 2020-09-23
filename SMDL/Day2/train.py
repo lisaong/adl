@@ -76,7 +76,7 @@ save_artifacts({'tokenizer_config': tokenizer_config})
 
 # create our model
 embedding_len = 100
-batch_size = 16
+batch_size = 128
 num_outputs = y_cat.shape[1]
 
 model_input = Input(shape=(sequence_len,), dtype='int64')
