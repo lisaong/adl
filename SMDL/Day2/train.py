@@ -7,10 +7,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.layers import Input, Embedding, LSTM, Flatten, Dense, Dropout
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense, Dropout
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.metrics import Precision, Recall
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 import pickle
@@ -37,7 +37,8 @@ print(df_train.info())
 # vectorize the text, but without padding
 # we will pad later on after we've generated the input and next-word (target) sequences
 # this allows us to perform pre-padding for shorter input sequences
-tokenizer = Tokenizer(num_words=20000, lower=True)
+vocab_size = 5000
+tokenizer = Tokenizer(num_words=vocab_size, lower=True)
 tokenizer.fit_on_texts(df_train['utterance'].values)
 
 sequences = tokenizer.texts_to_sequences(df_train['utterance'].values)
@@ -64,10 +65,43 @@ for s in sequences:
         X.append(np.array(s[j:j+sequence_len]))
         y.append(s[j+sequence_len])
 
-X_train, X_val, y_train, y_val = train_test_split(np.array(X), np.array(y))
+y_cat = to_categorical(y)
+
+X_train, X_val, y_train, y_val = train_test_split(np.array(X), np.array(y_cat))
 print(X_train.shape, X_val.shape, y_train.shape, y_val.shape)
 
 # save our tokenizer configuration
 tokenizer_config = json.loads(tokenizer.to_json())
 save_artifacts({'tokenizer_config': tokenizer_config})
+
+# create our model
+embedding_len = 100
+batch_size = 16
+num_outputs = y_cat.shape[1]
+
+model_input = Input(shape=(sequence_len,), dtype='int64')
+x = Embedding(vocab_size, embedding_len, input_length=sequence_len)(model_input)
+x = GRU(1024, return_sequences=True)(x)
+x = Flatten()(x)
+x = Dense(num_outputs, activation='softmax')(x)
+model = Model(model_input, x)
+model.summary()
+
+model.compile(optimizer='adam', loss='categorical_crossentropy',
+              metrics=['acc'])
+
+mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'gru.h5'),
+                     monitor='val_acc', save_best_only=True)
+
+history = model.fit(X_train, y_train, epochs=5, batch_size=batch_size, shuffle=True,
+                    validation_data=(X_val, y_val),
+                    callbacks=[mc])
+
+plt.plot(history.history['acc'], label='train')
+plt.plot(history.history['val_acc'], label='validation')
+plt.title('Learning Curve')
+plt.xlabel('epochs')
+plt.ylabel('accuracy')
+plt.legend()
+plt.show()
 
