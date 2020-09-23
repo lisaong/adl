@@ -8,14 +8,12 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Input, Embedding, GRU, Flatten, Dense
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
-from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split
-import pickle
-import os
 import json
+import os
+import pickle
 
 # globals
 MODEL_ARTIFACTS = dict()
@@ -46,6 +44,7 @@ sequences = tokenizer.texts_to_sequences(df_train['utterance'].values)
 # compute the median length
 sequence_len = int(np.median(np.array([len(s) for s in sequences])))
 print(sequence_len)
+save_artifacts({'sequence_len': sequence_len})
 
 # pad sequences to 1.25 * sequence_len
 # 125% is a heuristic - we don't want too much pre-paddings, but we also want the
@@ -65,10 +64,9 @@ for s in sequences:
         X.append(np.array(s[j:j+sequence_len]))
         y.append(s[j+sequence_len])
 
-y_cat = to_categorical(y)
-
-X_train, X_val, y_train, y_val = train_test_split(np.array(X), np.array(y_cat))
-print(X_train.shape, X_val.shape, y_train.shape, y_val.shape)
+# train-test split is not really necessary as we are building a generative model
+X = np.array(X)
+y_cat = np.array(to_categorical(y))
 
 # save our tokenizer configuration
 tokenizer_config = json.loads(tokenizer.to_json())
@@ -76,7 +74,7 @@ save_artifacts({'tokenizer_config': tokenizer_config})
 
 # create our model
 embedding_len = 100
-batch_size = 128
+batch_size = 64
 num_outputs = y_cat.shape[1]
 
 model_file = os.path.join(MODEL_DIR, 'gru.h5')
@@ -94,18 +92,26 @@ else:
     model.compile(optimizer='adam', loss='categorical_crossentropy',
                   metrics=['acc'])
 
-mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'gru.h5'),
-                     monitor='val_acc', save_best_only=True)
+mc = ModelCheckpoint(model_file,
+                     monitor='acc', save_best_only=True)
 
-history = model.fit(X_train, y_train, epochs=5, batch_size=batch_size, shuffle=True,
-                    validation_data=(X_val, y_val),
+history = model.fit(X, y_cat, epochs=5, batch_size=batch_size,
                     callbacks=[mc])
 
 plt.plot(history.history['acc'], label='train')
-plt.plot(history.history['val_acc'], label='validation')
 plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
 
+# generate the next 10 words in a sentence
+best_model = load_model(model_file)
+start = 'Today as i was leaving for work'
+test_seqs = tokenizer.texts_to_sequences([start])
+for i in range(10):
+    test_seqs_padded = pad_sequences(test_seqs, maxlen=sequence_len,
+                                     padding='pre', truncating='pre')
+    next_word = best_model.predict(test_seqs_padded).argmax(axis=1)
+    test_seqs[0].append(next_word[0])
+    print(tokenizer.sequences_to_texts(test_seqs))
