@@ -102,7 +102,6 @@ plt.plot(history.history['acc'], label='train')
 plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
-plt.legend()
 plt.show()
 
 # generate the next 10 words in a sentence
