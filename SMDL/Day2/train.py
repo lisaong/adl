@@ -79,16 +79,20 @@ embedding_len = 100
 batch_size = 128
 num_outputs = y_cat.shape[1]
 
-model_input = Input(shape=(sequence_len,), dtype='int64')
-x = Embedding(vocab_size, embedding_len, input_length=sequence_len)(model_input)
-x = GRU(1024, return_sequences=True)(x)
-x = Flatten()(x)
-x = Dense(num_outputs, activation='softmax')(x)
-model = Model(model_input, x)
-model.summary()
-
-model.compile(optimizer='adam', loss='categorical_crossentropy',
-              metrics=['acc'])
+model_file = os.path.join(MODEL_DIR, 'gru.h5')
+if os.path.isfile(model_file):
+    # load model if it already exists, so that we can continue training
+    model = load_model(model_file)
+else:
+    model_input = Input(shape=(sequence_len,), dtype='int64')
+    x = Embedding(vocab_size, embedding_len, input_length=sequence_len)(model_input)
+    x = GRU(1024, return_sequences=True)(x)
+    x = Flatten()(x)
+    x = Dense(num_outputs, activation='softmax')(x)
+    model = Model(model_input, x)
+    model.summary()
+    model.compile(optimizer='adam', loss='categorical_crossentropy',
+                  metrics=['acc'])
 
 mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'gru.h5'),
                      monitor='val_acc', save_best_only=True)
