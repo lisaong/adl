@@ -1,44 +1,17 @@
-## Lesson 1
-<p>This is a task description file.
-Its content will be displayed to a learner
-in the <strong>Task Description</strong> window.</p>
+## Text Vectorization
+Text vectorization performs pre-processing to convert words into numbers.
 
-### Hello?
-<p>It supports both Markdown and HTML.
-To toggle the format, you can rename <strong>task.md</strong>
-to <strong>task.html</strong>, or vice versa.
-The default task description format can be changed
-in <strong>Preferences | Tools | Education</strong>,
-but this will not affect any existing task description files.</p>
+The following settings are most commonly used for vectorization:
+- max_tokens: limits the size of the vocabulary. This does not include the padding token ('') and the out-of-vocabulary token ([Unk]). If not set, this will default to the number of unique tokens in all texts.
+- output_sequence_length: limits the length of the output sequences. Each row of text will be truncated or zero-padded to match this length. If not set, this will default to the longest sequence.
 
-<p>The following features are available in
-<strong>task.md/task.html</strong>
-which are specific to the EduTools plugin:</p>
+These are the default settings:
+```
+tf.keras.layers.experimental.preprocessing.TextVectorization(
+    max_tokens=None, standardize=LOWER_AND_STRIP_PUNCTUATION,
+    split=SPLIT_ON_WHITESPACE, ngrams=None, output_mode=INT,
+    output_sequence_length=None, pad_to_max_tokens=True, **kwargs
+)
+```
 
-<ul>
-<li>Hints can be added anywhere in the task text.
-Type "hint" and press Tab.
-Hints should be added to an empty line in the task text.
-In hints you can use HTML only.
-<div class="hint">Text of your hint</div></li>
-
-<li>You can insert shortcuts in the task description.
-While <strong>task.html/task.md</strong> is open,
-right-click anywhere on the <strong>Editor</strong> tab
-and choose the <strong>Insert shortcut</strong> option
-from the context menu.
-For example: &amp;shortcut:FileStructurePopup;.</li><br>
-
-<li>Insert the &percnt;<code>IDE_NAME</code>&percnt; macro,
-which will be replaced by the actual IDE name.
-For example, <strong>%IDE_NAME%</strong>.</li><br>
-
-<li>Insert PSI elements, by using links like
-<code>&lt;a href="psi_element://link.to.element"&gt;element description&lt;/a&gt;</code>.
-To get such a link, right-click the class or method
-and select <strong>Copy Reference</strong>.
-Then press &amp;shortcut:EditorPaste;
-to insert the link where appropriate.
-For example, a
-<a href="psi_element://java.lang.String#contains">link to the "contains" method</a>.</li>
-</ul>
+[Documentation](https://www.tensorflow.org/api_docs/python/tf/keras/layers/experimental/preprocessing/TextVectorization)
