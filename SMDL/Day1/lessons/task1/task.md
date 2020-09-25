@@ -1,7 +1,9 @@
+## Lesson 1
 <p>This is a task description file.
 Its content will be displayed to a learner
 in the <strong>Task Description</strong> window.</p>
 
+### Hello?
 <p>It supports both Markdown and HTML.
 To toggle the format, you can rename <strong>task.md</strong>
 to <strong>task.html</strong>, or vice versa.
