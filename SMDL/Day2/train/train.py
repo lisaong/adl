@@ -17,7 +17,7 @@ import pickle
 
 # globals
 MODEL_ARTIFACTS = dict()
-MODEL_DIR = os.path.join('app', 'demo', 'model')
+MODEL_DIR = os.path.join('..', 'app', 'demo', 'model')
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 
@@ -28,7 +28,7 @@ def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
 
 # we'll just use the training set for this task because we are predicting
 # the next word (generating our own target).
-df_train = pd.read_csv('../Day1/empathetic_dialogues_train.csv', index_col=0)
+df_train = pd.read_csv('../../Day1/data/empathetic_dialogues_train.csv', index_col=0)
 print(df_train.head())
 print(df_train.info())
 

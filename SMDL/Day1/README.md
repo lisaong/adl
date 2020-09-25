@@ -7,6 +7,7 @@
    ```
 2. Train model to predict sentiment of text
     ```
+    cd train
     python train.py
     ```
 3. Run Flask app

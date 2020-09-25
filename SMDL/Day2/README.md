@@ -3,6 +3,7 @@
 ### Setup
 1. Train model to generate text (GPU preferred)
     ```
+    cd train
     python train.py
     ```
    
