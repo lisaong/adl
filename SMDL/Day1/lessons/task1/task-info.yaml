@@ -1,5 +1,5 @@
 type: theory
 custom_name: Text Vectorization
 files:
-- name: examples.py
+- name: main.py
   visible: true
