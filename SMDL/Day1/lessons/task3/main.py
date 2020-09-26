@@ -78,3 +78,4 @@ for word, vector in zip(vocab, embedding_matrix[0]):
     ax.text(vector[0], vector[1], word)
 ax.set_title('2-dimensional word vectors learnt via training a classifier')
 plt.show()
+plt.savefig('vectors.png')

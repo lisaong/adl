@@ -112,6 +112,7 @@ plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.show()
+plt.savefig('learning_curve.png')
 
 # generate the next 10 words in a sentence
 best_model = load_model(model_file)
