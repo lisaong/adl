@@ -1,4 +1,4 @@
-# vectorizer demonstration
+# Vectorizer demonstration
 
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import numpy as np
