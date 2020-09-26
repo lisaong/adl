@@ -109,8 +109,8 @@ plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
-plt.show()
 plt.savefig('learning_curve.png')
+plt.show()
 
 # get metrics
 best_model = load_model(os.path.join(MODEL_DIR, 'lstm.h5'))

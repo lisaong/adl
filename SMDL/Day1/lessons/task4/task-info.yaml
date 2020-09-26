@@ -1,0 +1,7 @@
+type: theory
+custom_name: LSTM
+files:
+- name: main.py
+  visible: true
+- name: predictions.png
+  visible: true

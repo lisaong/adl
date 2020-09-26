@@ -111,8 +111,8 @@ plt.plot(history.history['acc'], label='train')
 plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
-plt.show()
 plt.savefig('learning_curve.png')
+plt.show()
 
 # generate the next 10 words in a sentence
 best_model = load_model(model_file)
