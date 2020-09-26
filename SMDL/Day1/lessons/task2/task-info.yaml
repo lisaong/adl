@@ -1,0 +1,5 @@
+type: theory
+custom_name: Labels to Categorical
+files:
+- name: main.py
+  visible: true
