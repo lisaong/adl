@@ -14,4 +14,6 @@ tf.keras.layers.experimental.preprocessing.TextVectorization(
 )
 ```
 
+Note: `TextVectorization` provides a quick way to convert text to sequences as input to the neural network. If you need to convert back from numeric sequences to text, you can refer to Day2's code, where we will use `tensorflow.keras.preprocessing.text.Tokenizer` to do the conversion in both directions (`tensorflow.keras.preprocessing.text.Tokenizer` is slightly more complicated to use because it does not do padding).
+
 [Documentation](https://www.tensorflow.org/api_docs/python/tf/keras/layers/experimental/preprocessing/TextVectorization)
