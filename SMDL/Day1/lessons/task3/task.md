@@ -20,7 +20,7 @@ No Embedding:
 
 With Embedding (output_dim 2):
 
-  'We the citizens of Singapore' => 5 words * 2 features per word
+  'we the citizens of singapore' => 5 words * 2 features per word
 
   'pledge ourselves as one united people' => 6 words * 2 features per word
 
@@ -35,4 +35,4 @@ The learnt embedding layer will also provide word vectors, which can be said to 
 
 Words that are similar in contextual meaning will have vectors closer together (e.g. 'achieve' and 'progress).
 
-For larger dimensional word vectors, you can use the [Embedding Projector] (https://projector.tensorflow.org/) to explore the word vector space.
+For larger dimensional word vectors, you can use the [Tensorflow Embedding Projector] (https://projector.tensorflow.org/) to explore the word vector space.
