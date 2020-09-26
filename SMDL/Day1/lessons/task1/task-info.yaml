@@ -1,0 +1,5 @@
+type: theory
+custom_name: Text Vectorization
+files:
+- name: main.py
+  visible: true
