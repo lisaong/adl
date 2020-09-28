@@ -3,3 +3,5 @@ custom_name: Training
 files:
 - name: main.py
   visible: true
+- name: learning_curve.png
+  visible: true

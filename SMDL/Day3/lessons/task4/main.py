@@ -2,9 +2,11 @@
 # https://www.tensorflow.org/tutorials/text/nmt_with_attention
 
 import tensorflow as tf
+from tensorflow.keras.models import save_model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import time
+import matplotlib.pyplot as plt
 
 # import classes and losses from previous tasks
 # (everything else we will re-declare below for clarity)
@@ -18,16 +20,22 @@ from task3.main import loss_function
 # source text
 english_text = ['Ask, and it will be given to you',
                 'seek, and you will find',
-                'knock, and it will be opened to you.']
+                'knock, and it will be opened to you.',
+                'For everyone who asks receives',
+                'and he who seeks finds',
+                'and to him who knocks it will be opened']
 
 # target text
 spanish_text = ['Pidan, y se les dará',
                 'busquen, y encontrarán',
-                'llamen, y se les abrirá.']
+                'llamen, y se les abrirá.',
+                'Porque todo el que pide, recibe',
+                'el que busca, encuentra',
+                'y al que llama, se le abre']
 
-BATCH_SIZE = 3
-EMBEDDING_SIZE = 2
-BOTTLENECK_UNITS = 1
+BATCH_SIZE = len(english_text)
+EMBEDDING_SIZE = 5
+BOTTLENECK_UNITS = 6
 
 START_TOKEN = 'aaaa'
 END_TOKEN = 'zzzz'
@@ -35,14 +43,14 @@ END_TOKEN = 'zzzz'
 # append start and end tokens, this will indicate when translation should start & stop
 src_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]
 
-src_vectorizer = TextVectorization(output_sequence_length=10)
+src_vectorizer = TextVectorization()
 src_vectorizer.adapt(src_text)
 src_sequences = src_vectorizer(src_text)
 src_vocab_size = len(src_vectorizer.get_vocabulary())
 
 target_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
 
-target_vectorizer = TextVectorization(output_sequence_length=10)
+target_vectorizer = TextVectorization()
 target_vectorizer.adapt(target_text)
 target_sequences = target_vectorizer(target_text)
 target_vocab_size = len(target_vectorizer.get_vocabulary())
@@ -104,6 +112,7 @@ def train_step(source, target, enc_hidden, optimizer):
 
 def train(epochs, batches_per_epoch, optimizer):
     # training loop
+    history = []
     for epoch in range(epochs):
         start_time = time.time()
 
@@ -114,12 +123,61 @@ def train(epochs, batches_per_epoch, optimizer):
         for batch in range(batches_per_epoch):
 
             # we are repeating the same target and source sequences in this toy example
-            batch_loss = train_step(src_sequences, target_sequences, enc_hidden, optimizer)
+            batch_loss = train_step(src_sequences,
+                                    target_sequences,
+                                    enc_hidden, optimizer)
             total_loss += batch_loss
             print(f'Epoch {epoch + 1} Batch {batch + 1} Loss {batch_loss.numpy():.4f}')
 
         print(f'Epoch {epoch + 1} Loss {(total_loss / batches_per_epoch):.4f} Elapsed {time.time() - start_time} sec\n')
+        history.append(total_loss / batches_per_epoch)
+
+    return history
+
+
+def predict(sentence: str):
+    # prepend start and end token
+    sentence = f'{START_TOKEN} {sentence} {END_TOKEN}'
+    inputs = src_vectorizer([sentence])
+    inputs = tf.convert_to_tensor(inputs)
+
+    result = ''
+
+    hidden = [tf.zeros((1, BOTTLENECK_UNITS))]
+    enc_out, enc_hidden = encoder(inputs, hidden)
+
+    dec_hidden = enc_hidden
+    dec_input = tf.expand_dims([target_start_token_index], 0)
+
+    sequence_len_to_try = 10
+    for t in range(sequence_len_to_try):
+        # get the predicted id for the next word
+        predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
+        predicted_id = tf.argmax(predictions[0]).numpy()
+        result += target_vectorizer.get_vocabulary()[predicted_id] + ' '
+
+        # stop when we reach the end token
+        if target_vectorizer.get_vocabulary()[predicted_id] == END_TOKEN:
+            break
+
+        # the predicted id and decoder hidden state is fed back into the model
+        dec_input = tf.expand_dims([predicted_id], 0)
+
+    return result
 
 
 if __name__ == '__main__':
-    train(epochs=10, batches_per_epoch=2, optimizer=Adam())
+    history = train(epochs=100, batches_per_epoch=20, optimizer=Adam())
+
+    plt.plot(history)
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.savefig('learning_curve.png')
+    plt.title('learning curve')
+    plt.show()
+
+    save_model(encoder, 'encoder.h5', save_format='tf')
+    save_model(decoder, 'decoder.h5', save_format='tf')
+
+    for t in english_text:
+        print(t, '=>', predict(t))

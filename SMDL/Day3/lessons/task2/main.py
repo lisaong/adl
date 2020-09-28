@@ -14,8 +14,8 @@ spanish_text = ['Pidan, y se les dará',
                 'llamen, y se les abrirá.']
 
 BATCH_SIZE = 3
-EMBEDDING_SIZE = 2
-BOTTLENECK_UNITS = 1
+EMBEDDING_SIZE = 4
+BOTTLENECK_UNITS = 2
 
 START_TOKEN = 'aaaaa'
 END_TOKEN = 'zzzzz'
@@ -23,7 +23,7 @@ END_TOKEN = 'zzzzz'
 # append start and end tokens, this will indicate when translation should start & stop
 target_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
 
-target_vectorizer = TextVectorization(output_sequence_length=10)
+target_vectorizer = TextVectorization()
 target_vectorizer.adapt(target_text)
 target_sequences = target_vectorizer(target_text)
 target_vocab_size = len(target_vectorizer.get_vocabulary())

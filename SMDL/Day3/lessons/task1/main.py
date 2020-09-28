@@ -13,8 +13,8 @@ english_text = ['Ask, and it will be given to you',
                 'knock, and it will be opened to you.']
 
 BATCH_SIZE = 3
-EMBEDDING_SIZE = 2
-BOTTLENECK_UNITS = 1
+EMBEDDING_SIZE = 4
+BOTTLENECK_UNITS = 2
 
 START_TOKEN = 'aaaaa'
 END_TOKEN = 'zzzzz'
@@ -22,7 +22,7 @@ END_TOKEN = 'zzzzz'
 # append start and end tokens, this will indicate when translation should start & stop
 src_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]
 
-src_vectorizer = TextVectorization(output_sequence_length=10)
+src_vectorizer = TextVectorization()
 src_vectorizer.adapt(src_text)
 src_sequences = src_vectorizer(src_text)
 src_vocab_size = len(src_vectorizer.get_vocabulary())
