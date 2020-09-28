@@ -7,3 +7,5 @@ files:
   visible: true
 - name: input_shape.png
   visible: true
+- name: lstm.png
+  visible: true
