@@ -1,9 +1,11 @@
 ## Day 2: Basic Text Generation
 
 ### Setup
-1. Train model to generate text (GPU preferred)
+1. Train model to generate text (GPU preferred).
     ```
     cd train
+
+    # You must complete the _ANS_ portions so that you can train the model
     python train.py
     ```
    

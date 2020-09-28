@@ -1,6 +1,11 @@
 # Day 1 - Emotion Classification
 # https://huggingface.co/nlp/viewer/?dataset=empathetic_dialogues
 
+# Instructions:
+# 1. Go through the lessons before you start
+# 2. Replace _ANS_ with your answers so that the code will run
+# 3. Submit your completed train.py with learning_curve.png
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
@@ -76,18 +81,21 @@ vocab_len = len(vectorizer.get_vocabulary())
 embedding_len = 75
 num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
-x = Embedding(vocab_len, embedding_len, input_length=sequence_len)(model_input)
-x = LSTM(16, activation='tanh', recurrent_dropout=.5)(x)
+
+x = Embedding(input_dim=_ANS_, output_dim=_ANS_)(model_input)
+x = LSTM(_ANS_, activation=_ANS_)(x)
 x = Flatten()(x)
-x = Dense(num_classes, activation='relu')(x)
+x = Dense(_ANS_, activation='relu')(x)
 x = Dropout(.5)(x)
-x = Dense(num_classes, activation='softmax')(x)
+x = Dense(_ANS_, activation='softmax')(x)
+
 model = Model(model_input, x)
 model.summary()
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['acc'])
 
+# periodically saves the best model every epoch
 mc = ModelCheckpoint(os.path.join(MODEL_DIR, 'lstm.h5'),
                      monitor='val_acc', save_best_only=True)
 
@@ -101,6 +109,7 @@ plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
+plt.savefig('learning_curve.png')
 plt.show()
 
 # get metrics

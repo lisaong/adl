@@ -1,0 +1,5 @@
+type: theory
+custom_name: Decoder
+files:
+- name: main.py
+  visible: true

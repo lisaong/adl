@@ -1,1 +1,4 @@
 .idea
+*.h5
+*.pkl
+.ipynb_checkpoints

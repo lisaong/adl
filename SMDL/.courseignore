@@ -1,4 +1,5 @@
 Day1/app/demo/model/model_artifacts.pkl
 Day1/app/demo/model/lstm.h5
+Day1/data/get_data.ipynb
 Day2/app/demo/model/model_artifacts.pkl
 Day2/app/demo/model/gru.h5

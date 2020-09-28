@@ -2,6 +2,11 @@
 # https://huggingface.co/nlp/viewer/?dataset=empathetic_dialogues
 # https://www.tensorflow.org/tutorials/text/text_generation
 
+# Instructions:
+# 1. Go through the lessons before you start
+# 2. Replace _ANS_ with your answers so that the code will run
+# 3. Submit your completed train.py with learning_curve.png
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -84,9 +89,13 @@ if os.path.isfile(model_file):
 else:
     model_input = Input(shape=(sequence_len,), dtype='int64')
     x = Embedding(vocab_size, embedding_len, input_length=sequence_len)(model_input)
-    x = GRU(1024, return_sequences=True)(x)
+
+    # Create a Gated Recurrent Unit layer, and set it to return sequences
+    x = _ANS_
     x = Flatten()(x)
-    x = Dense(num_outputs, activation='softmax')(x)
+
+    # Create a Dense layer with the required number of outputs
+    x = _ANS_
     model = Model(model_input, x)
     model.summary()
     model.compile(optimizer='adam', loss='categorical_crossentropy',
@@ -102,6 +111,7 @@ plt.plot(history.history['acc'], label='train')
 plt.title('Learning Curve')
 plt.xlabel('epochs')
 plt.ylabel('accuracy')
+plt.savefig('learning_curve.png')
 plt.show()
 
 # generate the next 10 words in a sentence
@@ -111,6 +121,9 @@ test_seqs = tokenizer.texts_to_sequences([start])
 for i in range(10):
     test_seqs_padded = pad_sequences(test_seqs, maxlen=sequence_len,
                                      padding='pre', truncating='pre')
-    next_word = best_model.predict(test_seqs_padded).argmax(axis=1)
+
+    # use best_model to generate the next word
+    # (remember to convert from categorical to ordinal)
+    next_word = _ANS_
     test_seqs[0].append(next_word[0])
     print(tokenizer.sequences_to_texts(test_seqs))
