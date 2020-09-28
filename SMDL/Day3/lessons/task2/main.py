@@ -7,26 +7,12 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Embedding, GRU, Dense
 import numpy as np
 
-# target text that we will eventually want to decode to
-# see previous task for the source text
-spanish_text = ['Pidan, y se les dará',
-                'busquen, y encontrarán',
-                'llamen, y se les abrirá.']
-
 BATCH_SIZE = 3
 EMBEDDING_SIZE = 4
 BOTTLENECK_UNITS = 2
 
 START_TOKEN = 'aaaaa'
 END_TOKEN = 'zzzzz'
-
-# append start and end tokens, this will indicate when translation should start & stop
-target_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
-
-target_vectorizer = TextVectorization()
-target_vectorizer.adapt(target_text)
-target_sequences = target_vectorizer(target_text)
-target_vocab_size = len(target_vectorizer.get_vocabulary())
 
 
 # Decoder
@@ -69,10 +55,22 @@ class MyDecoder(Model):
 
 # test
 if __name__ == '__main__':
+    # target text that we will eventually want to decode to
+    # see previous task for the source text
+    spanish_text = ['Pidan, y se les dará',
+                    'busquen, y encontrarán',
+                    'llamen, y se les abrirá.']
+
+    texts_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
+    vectorizer = TextVectorization()
+    vectorizer.adapt(texts_delimited)
+    print('Vocabulary', vectorizer.get_vocabulary())
+    vocab_size = len(vectorizer.get_vocabulary())
+
     sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
     sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
 
-    decoder = MyDecoder(target_vocab_size, embedding_dim=2,
+    decoder = MyDecoder(vocab_size, embedding_dim=2,
                         dec_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
     sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),

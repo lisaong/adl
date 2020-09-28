@@ -3,3 +3,6 @@ Day1/app/demo/model/lstm.h5
 Day1/data/get_data.ipynb
 Day2/app/demo/model/model_artifacts.pkl
 Day2/app/demo/model/gru.h5
+Day3/lessons/task4/decoder_weights.h5
+Day3/lessons/task4/encoder_weights.h5
+Day3/lessons/task4/model_artifacts.pkl
