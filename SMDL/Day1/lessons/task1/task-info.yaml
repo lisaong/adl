@@ -3,3 +3,5 @@ custom_name: Text Vectorization
 files:
 - name: main.py
   visible: true
+- name: vectorization.png
+  visible: true

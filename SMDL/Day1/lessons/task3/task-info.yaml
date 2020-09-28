@@ -5,3 +5,5 @@ files:
   visible: true
 - name: vectors.png
   visible: true
+- name: embedding.png
+  visible: true
