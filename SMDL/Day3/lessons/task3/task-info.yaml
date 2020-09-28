@@ -1,5 +1,5 @@
 type: theory
-custom_name: Training
+custom_name: Loss Function
 files:
 - name: main.py
   visible: true

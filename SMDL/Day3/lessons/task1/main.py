@@ -4,7 +4,7 @@
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Embedding, GRU, Dense
+from tensorflow.keras.layers import Embedding, GRU
 
 # We will encode this source text using the Encoder
 english_text = ['Ask, and it will be given to you',
@@ -61,4 +61,4 @@ print(sample_output)
 
 print('========================')
 print('Encoder hidden')
-print(sample_hidden)
+print(sample_hidden) # this will be passed to the next call to the encoder
