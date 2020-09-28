@@ -20,16 +20,15 @@ END_TOKEN = 'zzzzz'
 # we'll wrap the Encoder models into classes
 
 class MyEncoder(Model):
-    def __init__(self, vectorizer, embedding_dim, enc_units, batch_size):
+    def __init__(self, vocab_size, embedding_dim, enc_units, batch_size):
         super(MyEncoder, self).__init__()
-        self.vectorizer = vectorizer
+        self.vocab_size = vocab_size
         self.batch_size = batch_size
         self.enc_units = enc_units
-        self.embedding = Embedding(len(vectorizer.get_vocabulary()), embedding_dim)
+        self.embedding = Embedding(vocab_size, embedding_dim)
         self.gru = GRU(self.enc_units, return_state=True)
 
     def call(self, x, hidden):
-        x = self.vectorizer(x)
         x = self.embedding(x)
         output, state = self.gru(x, initial_state=hidden)
         return output, state
@@ -54,12 +53,13 @@ if __name__ == '__main__':  # so that we can import this file without running th
     vectorizer = TextVectorization()
     vectorizer.adapt(texts_delimited)
     print('Vocabulary', vectorizer.get_vocabulary())
+    vocab_len = len(vectorizer.get_vocabulary())
 
-    encoder = MyEncoder(vectorizer, embedding_dim=EMBEDDING_SIZE,
+    encoder = MyEncoder(vocab_len, embedding_dim=EMBEDDING_SIZE,
                         enc_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
     sample_hidden = encoder.initialize_hidden_state()
-    sample_output, sample_hidden = encoder(english_text, sample_hidden)
+    sample_output, sample_hidden = encoder(vectorizer(texts_delimited), sample_hidden)
     print(f'Encoder output shape: (batch size, sequence length, units) {sample_output.shape}')
 
     print('========================')
