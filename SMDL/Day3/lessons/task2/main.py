@@ -62,6 +62,10 @@ class MyDecoder(Model):
 
         return x, state
 
+    def get_config(self):
+        return {'batch_size': self.batch_size,
+                'dec_units': self.dec_units}
+
 
 # test
 if __name__ == '__main__':

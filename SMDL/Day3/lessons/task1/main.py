@@ -48,6 +48,10 @@ class MyEncoder(Model):
     def initialize_hidden_state(self):
         return tf.zeros((self.batch_size, self.enc_units))
 
+    def get_config(self):
+        return {'batch_size': self.batch_size,
+                'enc_units': self.enc_units}
+
 
 # test
 if __name__ == '__main__':  # so that we can import this file without running the test code

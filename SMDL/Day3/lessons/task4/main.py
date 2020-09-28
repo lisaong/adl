@@ -2,7 +2,6 @@
 # https://www.tensorflow.org/tutorials/text/nmt_with_attention
 
 import tensorflow as tf
-from tensorflow.keras.models import save_model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import time
@@ -176,8 +175,10 @@ if __name__ == '__main__':
     plt.title('learning curve')
     plt.show()
 
-    save_model(encoder, 'encoder.h5', save_format='tf')
-    save_model(decoder, 'decoder.h5', save_format='tf')
+    # save the weights using the HDF5 format
+    # https://www.tensorflow.org/guide/keras/save_and_serialize#tf_checkpoint_format
+    encoder.save_weights('encoder_weights.h5')
+    decoder.save_weights('decoder_weights.h5')
 
     for t in english_text:
         print(t, '=>', predict(t))
