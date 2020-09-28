@@ -4,10 +4,12 @@
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+import time
 
 # import classes and losses from previous tasks
 # (everything else we will re-declare below for clarity)
 import sys
+
 sys.path.append('..')
 from task1.main import MyEncoder
 from task2.main import MyDecoder
@@ -60,43 +62,64 @@ sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_
                                                        sample_hidden, sample_output)
 print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
 
+
 # https://www.tensorflow.org/api_docs/python/tf/function
 # Compile the function into a Tensorflow graph
-optimizer = Adam()
-
-
 @tf.function
-def train_step(source, target, enc_hidden):
+def train_step(source, target, enc_hidden, optimizer):
     loss = 0
 
     # enable automatic gradient in the block below
     with tf.GradientTape() as tape:
         enc_output, enc_hidden = encoder(source, enc_hidden)
-
         dec_hidden = enc_hidden
 
+        # set the start token
         dec_input = tf.expand_dims([target_start_token_index] * BATCH_SIZE, 1)
 
         # Teacher forcing - feeding the target as the next input
         for t in range(1, target.shape[1]):
+            # Loop through the target sequence,
             # passing enc_output to the decoder
-            predictions, dec_hidden, _ = decoder(dec_input, dec_hidden, enc_output)
-
+            predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_output)
             loss += loss_function(target[:, t], predictions)
 
-            # using teacher forcing
+            # Using teacher forcing by setting the decoder input to the next target
+            # (we don't use the predictions as input, only for compute the loss)
+            # (we are "teaching" the encoder-decoder with the target)
+
+            # target[:, t] shape == (batch_size, 1)
+            # tf.expand_dims(target[:, t], 1) shape == (batch_size, 1, 1)
             dec_input = tf.expand_dims(target[:, t], 1)
 
+    # compute the gradient of the loss w.r.t. weights
+    # apply gradient descent
+    weights = encoder.trainable_weights + decoder.trainable_weights
+    gradients = tape.gradient(loss, weights)
+    optimizer.apply_gradients(zip(gradients, weights))
+
     batch_loss = (loss / int(target.shape[1]))
-
-    variables = encoder.trainable_variables + decoder.trainable_variables
-
-    gradients = tape.gradient(loss, variables)
-
-    optimizer.apply_gradients(zip(gradients, variables))
-
     return batch_loss
 
 
+def train(epochs, batches_per_epoch, optimizer):
+    # training loop
+    for epoch in range(epochs):
+        start_time = time.time()
+
+        enc_hidden = encoder.initialize_hidden_state()
+        total_loss = 0
+
+        # loop batches per epoch
+        for batch in range(batches_per_epoch):
+
+            # we are repeating the same target and source sequences in this toy example
+            batch_loss = train_step(src_sequences, target_sequences, enc_hidden, optimizer)
+            total_loss += batch_loss
+            print(f'Epoch {epoch + 1} Batch {batch + 1} Loss {batch_loss.numpy():.4f}')
+
+        print(f'Epoch {epoch + 1} Loss {(total_loss / batches_per_epoch):.4f} Elapsed {time.time() - start_time} sec\n')
+
+
 if __name__ == '__main__':
-    pass
+    train(epochs=10, batches_per_epoch=2, optimizer=Adam())

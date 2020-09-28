@@ -47,7 +47,7 @@ class MyDecoder(Model):
         x = self.embedding(x)
 
         # enc_output shape == (batch_size, encoding_dim)
-        # tf.expand_dims(enc_output, 1) == (batch_size, 1, encoding_dim)
+        # tf.expand_dims(enc_output, 1) shape == (batch_size, 1, encoding_dim)
         # x shape after concatenation == (batch_size, 1, embedding_dim + encoding_dim)
         x = tf.concat([tf.expand_dims(enc_output, 1), x], axis=-1)
 
