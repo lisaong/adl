@@ -6,7 +6,8 @@ from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Embedding, GRU
 
-# We will encode this source text using the Encoder
+# source text that we want to encode
+# see next task for the target text
 english_text = ['Ask, and it will be given to you',
                 'seek, and you will find',
                 'knock, and it will be opened to you.']
@@ -25,6 +26,7 @@ src_vectorizer = TextVectorization(output_sequence_length=10)
 src_vectorizer.adapt(src_text)
 src_sequences = src_vectorizer(src_text)
 src_vocab_size = len(src_vectorizer.get_vocabulary())
+
 
 # Encoder
 # In the final task we'll look at adding Attention layers. To enable an easier comparison
@@ -48,17 +50,18 @@ class MyEncoder(Model):
 
 
 # test
-encoder = MyEncoder(src_vocab_size, embedding_dim=EMBEDDING_SIZE,
-                    enc_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
-sample_hidden = encoder.initialize_hidden_state()
-sample_output, sample_hidden = encoder(src_sequences, sample_hidden)
-print(f'Encoder output shape: (batch size, sequence length, units) {sample_output.shape}')
+if __name__ == '__main__':  # so that we can import this file without running the test code
+    encoder = MyEncoder(src_vocab_size, embedding_dim=EMBEDDING_SIZE,
+                        enc_units=BOTTLENECK_UNITS,
+                        batch_size=BATCH_SIZE)
+    sample_hidden = encoder.initialize_hidden_state()
+    sample_output, sample_hidden = encoder(src_sequences, sample_hidden)
+    print(f'Encoder output shape: (batch size, sequence length, units) {sample_output.shape}')
 
-print('========================')
-print('Encoder output')
-print(sample_output)
+    print('========================')
+    print('Encoder output')
+    print(sample_output)
 
-print('========================')
-print('Encoder hidden')
-print(sample_hidden) # this will be passed to the next call to the encoder
+    print('========================')
+    print('Encoder hidden')
+    print(sample_hidden)  # this will be passed to the next call to the encoder

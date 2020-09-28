@@ -7,6 +7,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Embedding, GRU, Dense
 import numpy as np
 
+# target text that we will eventually want to decode to
+# see previous task for the source text
 spanish_text = ['Pidan, y se les dará',
                 'busquen, y encontrarán',
                 'llamen, y se les abrirá.']
@@ -25,6 +27,7 @@ target_vectorizer = TextVectorization(output_sequence_length=10)
 target_vectorizer.adapt(target_text)
 target_sequences = target_vectorizer(target_text)
 target_vocab_size = len(target_vectorizer.get_vocabulary())
+
 
 # Decoder
 # In the next task we'll look at adding Attention layers. To enable an easier comparison
@@ -61,20 +64,21 @@ class MyDecoder(Model):
 
 
 # test
-sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
-sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
+if __name__ == '__main__':
+    sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
+    sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
 
-decoder = MyDecoder(target_vocab_size, embedding_dim=2,
-                    dec_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
-sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
-                                                       sample_encoder_hidden, sample_encoder_output)
-print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
+    decoder = MyDecoder(target_vocab_size, embedding_dim=2,
+                        dec_units=BOTTLENECK_UNITS,
+                        batch_size=BATCH_SIZE)
+    sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
+                                                           sample_encoder_hidden, sample_encoder_output)
+    print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
 
-print('========================')
-print('Decoder output')
-print(sample_decoder_output)
+    print('========================')
+    print('Decoder output')
+    print(sample_decoder_output)
 
-print('========================')
-print('Decoder hidden')
-print(sample_decoder_hidden) # this will be passed back into the next call to the decoder
+    print('========================')
+    print('Decoder hidden')
+    print(sample_decoder_hidden) # this will be passed back into the next call to the decoder
