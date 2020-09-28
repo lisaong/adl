@@ -11,6 +11,14 @@ from task1.main import MyEncoder
 from task2.main import MyDecoder
 
 
+# source text
+english_text = ['Ask, and it will be given to you',
+                'seek, and you will find',
+                'knock, and it will be opened to you.',
+                'For everyone who asks receives',
+                'and he who seeks finds',
+                'and to him who knocks it will be opened']
+
 model_artifacts = pickle.load(open('../task4/model_artifacts.pkl', 'rb'))
 
 BATCH_SIZE = model_artifacts['batch_size']
@@ -20,29 +28,29 @@ BOTTLENECK_UNITS = model_artifacts['bottleneck_units']
 START_TOKEN = model_artifacts['start_token']
 END_TOKEN = model_artifacts['end_token']
 
-# source text
-english_text = ['Ask, and it will be given to you',
-                'seek, and you will find',
-                'knock, and it will be opened to you.',
-                'For everyone who asks receives',
-                'and he who seeks finds',
-                'and to him who knocks it will be opened']
-
 
 def create_vectorizer(vocab, seq_len):
-    vectorizer = TextVectorization()
+    vectorizer = TextVectorization(max_tokens=None, output_sequence_length=seq_len)
     vectorizer.set_vocabulary(vocab)
     return vectorizer
 
 
 src_vectorizer = create_vectorizer(model_artifacts['src_vocab'],
                                    model_artifacts['src_seq_len'])
+
+# hack - somehow the vectorizer cannot be properly instantiated
+# if used for vectorization
+src_vectorizer.adapt([f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text])
 src_vocab_size = len(src_vectorizer.get_vocabulary())
+assert src_vectorizer.get_vocabulary() == model_artifacts['src_vocab'], \
+    'vocabs must be equal'
+# end hack
 
 target_vectorizer = create_vectorizer(model_artifacts['target_vocab'],
                                       model_artifacts['target_seq_len'])
-target_vocab_size = len(target_vectorizer.get_vocabulary())
-target_start_token_index = target_vectorizer.get_vocabulary().index(START_TOKEN)
+target_vocab = target_vectorizer.get_vocabulary()
+target_vocab_size = len(target_vocab)
+target_start_token_index = target_vocab.index(START_TOKEN)
 
 encoder = MyEncoder(src_vocab_size, embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
@@ -50,8 +58,7 @@ encoder = MyEncoder(src_vocab_size, embedding_dim=EMBEDDING_SIZE,
 sample_hidden = encoder.initialize_hidden_state()
 
 # call the model first to create the variables
-sample_output, sample_hidden = encoder(tf.zeros((BATCH_SIZE,
-                                                 model_artifacts['src_seq_len'])),
+sample_output, sample_hidden = encoder(tf.zeros((BATCH_SIZE, model_artifacts['src_seq_len'])),
                                        sample_hidden)
 encoder.load_weights('../task4/encoder_weights.h5')
 
