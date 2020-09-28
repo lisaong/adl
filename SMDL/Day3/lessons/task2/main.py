@@ -1,0 +1,78 @@
+# Toy RNN Encoder-Decoder (Part 2: Decoder)
+# https://www.tensorflow.org/tutorials/text/nmt_with_attention
+
+import tensorflow as tf
+from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Embedding, GRU, Dense
+import numpy as np
+
+spanish_text = ['Pidan, y se les dará',
+                'busquen, y encontrarán',
+                'llamen, y se les abrirá.']
+
+BATCH_SIZE = 3
+EMBEDDING_SIZE = 2
+BOTTLENECK_UNITS = 1
+
+START_TOKEN = '<start>'
+END_TOKEN = '<end>'
+
+# append start and end tokens, this will indicate when translation should start & stop
+target_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
+
+target_vectorizer = TextVectorization(output_sequence_length=10)
+target_vectorizer.adapt(target_text)
+target_sequences = target_vectorizer(target_text)
+target_vocab_size = len(target_vectorizer.get_vocabulary())
+
+# Decoder
+# In the next task we'll look at adding Attention layers. To enable an easier comparison
+# we'll wrap the Decoder models into classes
+
+class MyDecoder(Model):
+    def __init__(self, vocab_size, embedding_dim, dec_units, batch_size):
+        super(MyDecoder, self).__init__()
+        self.batch_size = batch_size
+        self.dec_units = dec_units
+        self.embedding = Embedding(vocab_size, embedding_dim)
+        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
+        self.fc = Dense(vocab_size)
+
+    def call(self, x, hidden, enc_output):
+        # x shape after passing through embedding == (batch_size, 1, embedding_dim)
+        x = self.embedding(x)
+
+        # enc_output shape == (batch_size, encoding_dim)
+        # tf.expand_dims(enc_output, 1) == (batch_size, 1, encoding_dim)
+        # x shape after concatenation == (batch_size, 1, embedding_dim + encoding_dim)
+        x = tf.concat([tf.expand_dims(enc_output, 1), x], axis=-1)
+
+        # passing the concatenated vector to the GRU
+        output, state = self.gru(x)
+
+        # output shape == (batch_size * 1, hidden_size)
+        output = tf.reshape(output, (-1, output.shape[2]))
+
+        # output shape == (batch_size, vocab)
+        x = self.fc(output)
+
+        return x, state
+
+
+# test
+sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype='float32')
+sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype='float32')
+
+decoder = MyDecoder(target_vocab_size, embedding_dim=2, dec_units=BOTTLENECK_UNITS, batch_size=BATCH_SIZE)
+sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
+                                                       sample_encoder_hidden, sample_encoder_output)
+print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
+
+print('========================')
+print('Decoder output')
+print(sample_decoder_output)
+
+print('========================')
+print('Decoder hidden')
+print(sample_decoder_hidden)

@@ -1,5 +1,5 @@
 type: theory
-custom_name: Encoder
+custom_name: Attention
 files:
 - name: main.py
   visible: true
