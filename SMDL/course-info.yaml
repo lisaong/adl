@@ -7,4 +7,5 @@ programming_language: Python
 programming_language_version: 3.8
 environment: unittest
 content:
+- Day3
 - Day1
