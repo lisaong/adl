@@ -40,32 +40,32 @@ BOTTLENECK_UNITS = 6
 START_TOKEN = 'aaaa'
 END_TOKEN = 'zzzz'
 
+
+def get_vectorizer(texts):
+    vectorizer = TextVectorization()
+    vectorizer.adapt(texts)
+    return vectorizer
+
+
 src_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]
-src_vectorizer = TextVectorization()
-src_vectorizer.adapt(src_delimited)
-print('Source Vocabulary', src_vectorizer.get_vocabulary())
+src_vectorizer = get_vectorizer(src_delimited)
+src_vocab = src_vectorizer.get_vocabulary()
+print('Source Vocabulary', src_vocab)
+src_sequences = src_vectorizer(src_delimited)
 
 target_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
-target_vectorizer = TextVectorization()
-target_vectorizer.adapt(target_delimited)
+target_vectorizer = get_vectorizer(target_delimited)
 target_vocab = target_vectorizer.get_vocabulary()
 print('Target Vocabulary', target_vocab)
 target_sequences = target_vectorizer(target_delimited)
 
-encoder = MyEncoder(src_vectorizer, embedding_dim=EMBEDDING_SIZE,
+encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
-sample_hidden = encoder.initialize_hidden_state()
-sample_output, sample_hidden = encoder(src_delimited, sample_hidden)
-print(f'Encoder output shape: (batch size, sequence length, units) {sample_output.shape}')
 
 decoder = MyDecoder(len(target_vocab), embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
-sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
-                                                       sample_hidden, sample_output)
-print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
-
 
 # https://www.tensorflow.org/api_docs/python/tf/function
 # Compile the function into a Tensorflow graph
@@ -118,7 +118,7 @@ def train(epochs, batches_per_epoch, optimizer):
         # loop batches per epoch
         for batch in range(batches_per_epoch):
             # we are repeating the same target and source sequences in this toy example
-            batch_loss = train_step(src_delimited,
+            batch_loss = train_step(src_sequences,
                                     target_sequences,
                                     enc_hidden, optimizer)
             total_loss += batch_loss
@@ -140,12 +140,14 @@ if __name__ == '__main__':
     plt.title('learning curve')
     plt.show()
 
-    # save the model weights using the TF format for compatibility
-    encoder.save_weights('encoder_weights.tf', save_format='tf')
-    decoder.save_weights('decoder_weights.tf', save_format='tf')
+    # save the model weights
+    encoder.save_weights('encoder_weights.h5')
+    decoder.save_weights('decoder_weights.h5')
 
     # save the artifacts
-    artifacts = {'target_vocab': target_vectorizer.get_vocabulary(),
+    artifacts = {'src_vocab': src_vectorizer.get_vocabulary(),
+                 'src_seq_len': src_sequences.numpy().shape[1],
+                 'target_vocab': target_vectorizer.get_vocabulary(),
                  'target_seq_len': target_sequences.numpy().shape[1],
                  'start_token': START_TOKEN,
                  'end_token': END_TOKEN,
