@@ -16,8 +16,8 @@ BATCH_SIZE = 3
 EMBEDDING_SIZE = 2
 BOTTLENECK_UNITS = 1
 
-START_TOKEN = '<start>'
-END_TOKEN = '<end>'
+START_TOKEN = 'aaaaa'
+END_TOKEN = 'zzzzz'
 
 # append start and end tokens, this will indicate when translation should start & stop
 src_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]

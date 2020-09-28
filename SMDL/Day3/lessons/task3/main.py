@@ -10,8 +10,8 @@ spanish_text = ['Pidan, y se les dará',
                 'busquen, y encontrarán',
                 'llamen, y se les abrirá.']
 
-START_TOKEN = '<start>'
-END_TOKEN = '<end>'
+START_TOKEN = 'aaaaa'
+END_TOKEN = 'zzzzz'
 
 # append start and end tokens, this will indicate when translation should start & stop
 target_text = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
