@@ -5,17 +5,3 @@ files:
   visible: true
 - name: learning_curve.png
   visible: true
-- name: encoder_ckpt.index
-  visible: true
-- name: encoder_ckpt.data-00000-of-00001
-  visible: true
-- name: decoder_ckpt.index
-  visible: true
-- name: decoder_ckpt.data-00000-of-00001
-  visible: true
-- name: checkpoint
-  visible: true
-- name: encoder_weights.h5
-  visible: true
-- name: decoder_weights.h5
-  visible: true
