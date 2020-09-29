@@ -118,6 +118,7 @@ def train(train_dataset, epochs, optimizer):
         enc_hidden = encoder.initialize_hidden_state()
         total_loss = 0
 
+        # https://www.tensorflow.org/guide/keras/writing_a_training_loop_from_scratch
         for batch, (src_batch, tgt_batch) in enumerate(train_dataset):
             batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
             total_loss += batch_loss
