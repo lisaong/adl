@@ -64,6 +64,7 @@ encoder = MyEncoder(_ANS_)
 # TODO: Replace _ANS_ with your solution to create the decoder
 decoder = MyDecoder(_ANS_)
 
+
 # Part 3: Loss Function
 loss_equation = SparseCategoricalCrossentropy(from_logits=True, reduction='none')
 
