@@ -55,12 +55,12 @@ target_start_token_index = target_vocab.index(START_TOKEN)
 encoder = MyEncoder(src_vocab_size, embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
-sample_hidden = encoder.initialize_hidden_state()
-
 # call the model first to create the variables
+sample_hidden = encoder.initialize_hidden_state()
 sample_output, sample_hidden = encoder(tf.zeros((BATCH_SIZE, model_artifacts['src_seq_len'])),
                                        sample_hidden)
 encoder.load_weights('../task4/encoder_weights.h5')
+print(encoder.summary())
 
 decoder = MyDecoder(target_vocab_size, embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
@@ -69,15 +69,15 @@ decoder = MyDecoder(target_vocab_size, embedding_dim=EMBEDDING_SIZE,
 _ = decoder(tf.random.uniform((BATCH_SIZE, 1)),
             sample_hidden, sample_output)
 decoder.load_weights('../task4/decoder_weights.h5')
+print(decoder.summary())
 
 
 def predict(sentence: str):
-    # prepend start and end token
+    result = ''
+
     sentence = f'{START_TOKEN} {sentence} {END_TOKEN}'
     inputs = src_vectorizer([sentence])
     inputs = tf.convert_to_tensor(inputs)
-
-    result = ''
 
     hidden = [tf.zeros((1, BOTTLENECK_UNITS))]
     enc_out, enc_hidden = encoder(inputs, hidden)

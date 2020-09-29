@@ -3,7 +3,7 @@
 
 # Instructions:
 # 1. Go through the lessons before you start
-# 2. Replace _ANS_ with your answers so that the code will run
+# 2. Search for the TODOs, replace _ANS_ with your answers so that the code will run
 # 3. Submit your completed train.py with learning_curve.png
 
 import pandas as pd
@@ -82,6 +82,7 @@ embedding_len = 75
 num_classes = len(le.classes_)
 model_input = Input(shape=(sequence_len,), dtype='int64')
 
+# TODO: Replace _ANS_ with your answers
 x = Embedding(input_dim=_ANS_, output_dim=_ANS_)(model_input)
 x = LSTM(_ANS_, activation=_ANS_)(x)
 x = Flatten()(x)
