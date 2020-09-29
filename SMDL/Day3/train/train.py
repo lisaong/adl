@@ -2,7 +2,7 @@
 
 # Instructions:
 # 1. Go through the lessons before you start
-# 2. Replace _ANS_ with your answers so that the code will run
+# 2. Search for the TODOs, replace _ANS_ with your answers so that the code will run
 # 3. Submit your completed train.py with learning_curve.png
 
 import pandas as pd
@@ -276,3 +276,6 @@ if __name__ == '__main__':
     plt.ylabel('loss')
     plt.savefig('learning_curve.png')
     plt.show()
+
+    # TODO: Add code here to save the models
+    # _ANS_

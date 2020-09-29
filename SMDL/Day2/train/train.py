@@ -4,7 +4,7 @@
 
 # Instructions:
 # 1. Go through the lessons before you start
-# 2. Replace _ANS_ with your answers so that the code will run
+# 2. Search for the TODOs, replace _ANS_ with your answers so that the code will run
 # 3. Submit your completed train.py with learning_curve.png
 
 import pandas as pd
@@ -90,6 +90,7 @@ else:
     model_input = Input(shape=(sequence_len,), dtype='int64')
     x = Embedding(vocab_size, embedding_len, input_length=sequence_len)(model_input)
 
+    # TODO: Replace _ANS_ with your answers
     # Create a Gated Recurrent Unit layer, and set it to return sequences
     x = _ANS_
     x = Flatten()(x)
@@ -124,6 +125,7 @@ for i in range(10):
 
     # use best_model to generate the next word
     # (remember to convert from categorical to ordinal)
+    # TODO: Replace _ANS_ with your answers
     next_word = _ANS_
     test_seqs[0].append(next_word[0])
     print(tokenizer.sequences_to_texts(test_seqs))
