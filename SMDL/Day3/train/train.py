@@ -78,9 +78,8 @@ class MyEncoder(Model):
                 'enc_units': self.enc_units}
 
 
-# TODO: Replace _ANS_ with your solution
-#encoder = _ANS_
-encoder = MyEncoder(len(vocab_src), embedding_dim=EMBEDDING_SIZE,
+# TODO: Replace _ANS_ with your solution to create the encoder
+encoder = MyEncoder(_ANS_, embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
 
@@ -121,9 +120,8 @@ class MyDecoder(Model):
                 'dec_units': self.dec_units}
 
 
-# TODO: Replace _ANS_ with your solution
-# decoder = _ANS_
-decoder = MyDecoder(len(vocab_tgt), embedding_dim=EMBEDDING_SIZE,
+# TODO: Replace _ANS_ with your solution to create the decoder
+decoder = MyDecoder(_ANS_, embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
 
@@ -193,9 +191,11 @@ def train(train_ds, val_ds, epochs, optimizer):
 
         # loop batches per epoch
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
-            batch_loss = train_step(src_batch,
-                                    tgt_batch,
-                                    enc_hidden, optimizer)
+
+            # TODO: perform training using the train_step function
+            # Replace _ANS_ with your solution
+            batch_loss = _ANS_
+
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
 
@@ -233,38 +233,6 @@ def validate(dataset):
     return total_loss/(batch+1)
 
 
-# Part 5: Predict
-def predict(sentence: str):
-    # prepend start and end token
-    sentence = f'{START_TOKEN} {sentence} {END_TOKEN}'
-    inputs = vectorizer_src([sentence])
-    inputs = tf.convert_to_tensor(inputs)
-
-    result = ''
-
-    hidden = [tf.zeros((1, BOTTLENECK_UNITS))]
-    enc_out, enc_hidden = encoder(inputs, hidden)
-
-    dec_hidden = enc_hidden
-    dec_input = tf.expand_dims([vectorizer_tgt.index(START_TOKEN)], 0)
-
-    sequence_len_to_try = 10
-    for t in range(sequence_len_to_try):
-        # get the predicted id for the next word
-        predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
-        predicted_id = tf.argmax(predictions[0]).numpy()
-        result += vocab_tgt[predicted_id] + ' '
-
-        # stop when we reach the end token
-        if vocab_tgt[predicted_id] == END_TOKEN:
-            break
-
-        # the predicted id and decoder hidden state is fed back into the model
-        dec_input = tf.expand_dims([predicted_id], 0)
-
-    return result
-
-
 if __name__ == '__main__':
     limit = 512  # experiment with smaller dataset sizes
     train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src[:limit], seq_train_tgt[:limit]))
@@ -276,14 +244,15 @@ if __name__ == '__main__':
 
     plt.plot(history['loss'], label='train')
     plt.plot(history['val_loss'], label='validation')
+    plt.legend()
     plt.title('Learning Curve for Email Subject Translation')
     plt.xlabel('epochs')
     plt.ylabel('loss')
     plt.savefig('learning_curve.png')
     plt.show()
 
-    # Save the model
-    # We'll recreate the vectorizers on deployment due to their limitations
+    # Save the model weights only
+    # (Note: We'll recreate the vectorizers on deployment due to their limitations)
     os.makedirs('../app/demo/model', exist_ok=True)
     encoder.save_weights('../app/demo/model/encoder_weights.h5')
     decoder.save_weights('../app/demo/model/decoder_weights.h5')
