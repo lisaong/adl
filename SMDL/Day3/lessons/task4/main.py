@@ -121,9 +121,9 @@ def train(train_dataset, epochs, optimizer):
         for batch, (src_batch, tgt_batch) in enumerate(train_dataset):
             batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
             total_loss += batch_loss
-            print(f'Epoch {epoch + 1} Batch {batch + 1} Loss {batch_loss.numpy():.4f}')
+            print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
 
-        print(f'Epoch {epoch + 1} Loss {(total_loss / (batch+1)):.4f} Elapsed {time.time() - start_time} sec\n')
+        print(f'>> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} Elapsed {time.time() - start_time:.4f} sec')
         loss_history.append(total_loss / (batch+1))
 
     return loss_history
@@ -132,7 +132,8 @@ def train(train_dataset, epochs, optimizer):
 if __name__ == '__main__':
     # Create a batched dataset
     dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
-    dataset = dataset.shuffle((len(src_sequences)+len(tgt_sequences))*256).batch(BATCH_SIZE)
+    dataset = dataset.shuffle((len(src_sequences)+len(tgt_sequences))*256).batch(BATCH_SIZE,
+                                                                                 drop_remainder=True)
 
     history = train(dataset, epochs=2000, optimizer=Adam())
 

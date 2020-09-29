@@ -7,6 +7,7 @@
 
 import pandas as pd
 import tensorflow as tf
+import matplotlib.pyplot as plt
 import time
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
@@ -195,8 +196,8 @@ def train(train_ds, val_ds, epochs, optimizer):
 
         val_loss = validate(val_ds)
 
-        print(f'> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} '
-              f'Val Loss {val_loss:.4f} Elapsed {time.time() - start_time} sec\n')
+        print(f'>> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} '
+              f'Val Loss {val_loss:.4f} Elapsed {time.time() - start_time:.4f} sec\n')
         hist['loss'].append(total_loss / (batch+1))
         hist['val_loss'].append(val_loss)
 
@@ -260,12 +261,18 @@ def predict(sentence: str):
 
 
 if __name__ == '__main__':
-    limit = 512 # experiment with smaller dataset sizes
+    limit = 512  # experiment with smaller dataset sizes
     train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src[:limit], seq_train_tgt[:limit]))
-    train_dataset = train_dataset.shuffle(1024).batch(BATCH_SIZE)
+    train_dataset = train_dataset.shuffle(1024).batch(BATCH_SIZE, drop_remainder=True)
     val_dataset = tf.data.Dataset.from_tensor_slices((seq_val_src[:limit], seq_val_tgt[:limit]))
-    val_dataset = val_dataset.batch(BATCH_SIZE)
+    val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
 
     history = train(train_dataset, val_dataset, epochs=10, optimizer=tf.keras.optimizers.Adam())
 
-
+    plt.plot(history['loss'], label='train')
+    plt.plot(history['val_loss'], label='validation')
+    plt.title('Learning Curve for Email Subject Translation')
+    plt.xlabel('epochs')
+    plt.ylabel('loss')
+    plt.savefig('learning_curve.png')
+    plt.show()
