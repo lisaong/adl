@@ -4,13 +4,20 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
-# if calling this script directly
+import imp
 import sys
-sys.path.append('model')
-from seq2seq import MyEncoder, MyDecoder
 
-# if importing from view.py
-#from demo.model.seq2seq import MyEncoder, MyDecoder
+sys.path.append('model')
+try:
+    imp.find_module('seq2seq')
+    found = True
+except ImportError:
+    found = False
+
+if found: # testing only
+    from seq2seq import MyEncoder, MyDecoder
+else: # run from flask app
+    from demo.model.seq2seq import MyEncoder, MyDecoder
 
 
 class TFModel:
