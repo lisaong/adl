@@ -16,9 +16,6 @@ END_TOKEN = 'zzzzz'
 
 
 # Decoder
-# In the next task we'll look at adding Attention layers. To enable an easier comparison
-# we'll wrap the Decoder models into classes
-
 class MyDecoder(Model):
     def __init__(self, vocab_size, embedding_dim, dec_units, batch_size):
         super(MyDecoder, self).__init__()
@@ -49,6 +46,7 @@ class MyDecoder(Model):
         return x, state
 
     def get_config(self):
+        # to enable model saving as HDF5 format
         return {'batch_size': self.batch_size,
                 'dec_units': self.dec_units}
 
@@ -70,7 +68,7 @@ if __name__ == '__main__':
     sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
     sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
 
-    decoder = MyDecoder(vocab_size, embedding_dim=2,
+    decoder = MyDecoder(vocab_size, embedding_dim=EMBEDDING_SIZE,
                         dec_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
     sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),

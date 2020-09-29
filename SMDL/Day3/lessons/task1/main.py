@@ -16,9 +16,6 @@ END_TOKEN = 'zzzzz'
 
 
 # Encoder
-# In the final task we'll look at adding Attention layers. To enable an easier comparison
-# we'll wrap the Encoder models into classes
-
 class MyEncoder(Model):
     def __init__(self, vocab_size, embedding_dim, enc_units, batch_size):
         super(MyEncoder, self).__init__()
@@ -37,6 +34,7 @@ class MyEncoder(Model):
         return tf.zeros((self.batch_size, self.enc_units))
 
     def get_config(self):
+        # to enable model saving as HDF5 format
         return {'batch_size': self.batch_size,
                 'enc_units': self.enc_units}
 
