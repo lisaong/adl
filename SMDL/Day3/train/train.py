@@ -175,9 +175,9 @@ def train_step(source, target, enc_hidden, optimizer):
 
 def train(train_ds, val_ds, epochs, optimizer):
     # training loop
-    history = {
-        'loss' : [],
-        'val_loss' : []
+    hist = {
+        'loss': [],
+        'val_loss': []
     }
     for epoch in range(epochs):
         start_time = time.time()
@@ -197,10 +197,10 @@ def train(train_ds, val_ds, epochs, optimizer):
 
         print(f'> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} '
               f'Val Loss {val_loss:.4f} Elapsed {time.time() - start_time} sec\n')
-        history['loss'].append(total_loss / (batch+1))
-        history['val_loss'].append(val_loss)
+        hist['loss'].append(total_loss / (batch+1))
+        hist['val_loss'].append(val_loss)
 
-    return history
+    return hist
 
 
 def validate(dataset):
@@ -217,7 +217,7 @@ def validate(dataset):
             # Loop through the target sequence,
             # passing enc_output to the decoder
             predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_output)
-            loss += loss_function(src_batch[:, t], predictions)
+            loss += loss_function(tgt_batch[:, t], predictions)
 
             # the predicted id and decoder hidden state is fed back into the model
             predicted_id = tf.argmax(predictions, axis=1)  # shape: (BATCH_SIZE)
