@@ -9,6 +9,7 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import time
+import os
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.layers import Embedding, GRU, Dense
@@ -77,6 +78,8 @@ class MyEncoder(Model):
                 'enc_units': self.enc_units}
 
 
+# TODO: Replace _ANS_ with your solution
+#encoder = _ANS_
 encoder = MyEncoder(len(vocab_src), embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
@@ -118,6 +121,8 @@ class MyDecoder(Model):
                 'dec_units': self.dec_units}
 
 
+# TODO: Replace _ANS_ with your solution
+# decoder = _ANS_
 decoder = MyDecoder(len(vocab_tgt), embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
@@ -267,7 +272,7 @@ if __name__ == '__main__':
     val_dataset = tf.data.Dataset.from_tensor_slices((seq_val_src[:limit], seq_val_tgt[:limit]))
     val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
 
-    history = train(train_dataset, val_dataset, epochs=10, optimizer=tf.keras.optimizers.Adam())
+    history = train(train_dataset, val_dataset, epochs=20, optimizer=tf.keras.optimizers.Adam())
 
     plt.plot(history['loss'], label='train')
     plt.plot(history['val_loss'], label='validation')
@@ -277,5 +282,8 @@ if __name__ == '__main__':
     plt.savefig('learning_curve.png')
     plt.show()
 
-    # TODO: Add code here to save the models
-    # _ANS_
+    # Save the model
+    # We'll recreate the vectorizers on deployment due to their limitations
+    os.makedirs('../app/demo/model', exist_ok=True)
+    encoder.save_weights('../app/demo/model/encoder_weights.h5')
+    decoder.save_weights('../app/demo/model/decoder_weights.h5')
