@@ -22,7 +22,7 @@ START_TOKEN = 'aaaaaa'
 END_TOKEN = 'zzzzzz'
 
 BATCH_SIZE = 16
-EMBEDDING_SIZE = 16
+EMBEDDING_SIZE = 10
 BOTTLENECK_UNITS = 8
 
 
@@ -40,9 +40,9 @@ def vectorize(train_texts: list, val_texts: list):
 df_train, df_val = get_data()
 
 train_src = get_delimited_texts(df_train['english'])
-train_tgt = get_delimited_texts(df_train['greek'])
+train_tgt = get_delimited_texts(df_train['german'])
 val_src = get_delimited_texts(df_val['english'])
-val_tgt = get_delimited_texts(df_val['greek'])
+val_tgt = get_delimited_texts(df_val['german'])
 
 # vectorize
 vectorizer_src, seq_train_src, seq_val_src = vectorize(train_src, val_src)
@@ -57,12 +57,18 @@ print(f'Target Vocab size: {len(vocab_tgt)}')
 
 # Part 1b: Encoder
 # TODO: Replace _ANS_ with your solution to create the encoder
-encoder = MyEncoder(_ANS_)
+# encoder = _ANS_
+encoder = MyEncoder(len(vocab_src), embedding_dim=EMBEDDING_SIZE,
+                    enc_units=BOTTLENECK_UNITS,
+                    batch_size=BATCH_SIZE)
 
 
 # Part 2: Decoder
 # TODO: Replace _ANS_ with your solution to create the decoder
-decoder = MyDecoder(_ANS_)
+# decoder = _ANS_
+decoder = MyDecoder(len(vocab_tgt), embedding_dim=EMBEDDING_SIZE,
+                    dec_units=BOTTLENECK_UNITS,
+                    batch_size=BATCH_SIZE)
 
 
 # Part 3: Loss Function
@@ -132,7 +138,8 @@ def train(train_ds, val_ds, epochs, optimizer):
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
             # TODO: perform training using the train_step function
             # Replace _ANS_ with your solution
-            batch_loss = _ANS_
+            # batch_loss = _ANS_
+            batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
 
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
