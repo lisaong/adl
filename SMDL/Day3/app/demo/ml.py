@@ -3,17 +3,22 @@ import pickle
 import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
-from Day3.app.demo.model.seq2seq import MyEncoder, MyDecoder
+
+import sys
+
+sys.path.append('model')
+
+from seq2seq import MyEncoder, MyDecoder
 
 
 class TFModel:
     def __init__(self, model_dir):
         # load the artifacts
-        self.artifacts = pickle.load(open(os.path.join(model_dir, 'model_artifacts,pkl'), 'rb'))
+        self.artifacts = pickle.load(open(os.path.join(model_dir, 'model_artifacts.pkl'), 'rb'))
 
         # create the vectorizers
-        train_src = np.load(os.path.join(model_dir, 'train_src.npy'))
-        train_tgt = np.load(os.path.join(model_dir, 'train_tgt.npy'))
+        train_src = np.load(os.path.join(model_dir, 'train_src.npy'), allow_pickle=True)
+        train_tgt = np.load(os.path.join(model_dir, 'train_tgt.npy'), allow_pickle=True)
 
         vectorizer_src = TextVectorization()
         vectorizer_src.adapt(train_src)
@@ -40,14 +45,14 @@ class TFModel:
 
         vocab_tgt = vectorizer_tgt.get_vocabulary()
         self.decoder = MyDecoder(len(vocab_tgt), embedding_dim=self.artifacts['embedding_size'],
-                                 enc_units=self.artifacts['bottleneck_units'],
+                                 dec_units=self.artifacts['bottleneck_units'],
                                  batch_size=self.artifacts['batch_size'])
+
         # call the model first to create the variables
         _ = self.decoder(tf.random.uniform((self.artifacts['batch_size'], 1)),
                          sample_hidden, sample_output)
         self.decoder.load_weights(os.path.join(model_dir, 'decoder_weights.h5'))
         print(self.decoder.summary())
-
 
     def predict(self, sentence: str):
         result = ''
@@ -79,3 +84,13 @@ class TFModel:
             dec_input = tf.expand_dims([predicted_id], 0)
 
         return result
+
+
+# tests
+if __name__ == '__main__':
+    model = TFModel(model_dir='model')
+
+    train_src = np.load(os.path.join('model', 'train_src.npy'), allow_pickle=True)
+
+    for t in train_src[:5]:
+        print(t, model.predict(t))
