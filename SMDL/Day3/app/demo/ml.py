@@ -92,5 +92,5 @@ if __name__ == '__main__':
 
     train_src = np.load(os.path.join('model', 'train_src.npy'), allow_pickle=True)
 
-    for t in train_src[:5]:
-        print(t, model.predict(t))
+    for t in train_src[:10]:
+        print(model.predict(t))

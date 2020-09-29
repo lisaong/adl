@@ -1,4 +1,4 @@
-# Day 3 - Neural Machine Translation (Enron Emails)
+# Day 3 - Neural Machine Translation
 
 # Instructions:
 # 1. Go through the lessons before you start
@@ -11,20 +11,19 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import pickle
 import time
-from tensorflow.keras.models import Model
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
-from tensorflow.keras.layers import Embedding, GRU, Dense
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
+from shutil import copyfile
+
+from make_dataset import get_data
+from seq2seq import MyEncoder, MyDecoder
 
 START_TOKEN = 'aaaaaa'
 END_TOKEN = 'zzzzzz'
 
 BATCH_SIZE = 16
-EMBEDDING_SIZE = 30
-BOTTLENECK_UNITS = 5
-
-df_train = pd.read_csv('../data/aeslc_train.csv', index_col=0)
-df_val = pd.read_csv('../data/aeslc_val.csv', index_col=0)
+EMBEDDING_SIZE = 16
+BOTTLENECK_UNITS = 8
 
 
 def get_delimited_texts(s: pd.Series):
@@ -38,11 +37,12 @@ def vectorize(train_texts: list, val_texts: list):
 
 
 # Part 1a: Vectorize
-# delimit with start and end tokens
-train_src = get_delimited_texts(df_train['email_body'])
-train_tgt = get_delimited_texts(df_train['subject_line'])
-val_src = get_delimited_texts(df_val['email_body'])
-val_tgt = get_delimited_texts(df_val['subject_line'])
+df_train, df_val = get_data()
+
+train_src = get_delimited_texts(df_train['english'])
+train_tgt = get_delimited_texts(df_train['greek'])
+val_src = get_delimited_texts(df_val['english'])
+val_tgt = get_delimited_texts(df_val['greek'])
 
 # vectorize
 vectorizer_src, seq_train_src, seq_val_src = vectorize(train_src, val_src)
@@ -56,76 +56,17 @@ print(f'Target Vocab size: {len(vocab_tgt)}')
 
 
 # Part 1b: Encoder
-class MyEncoder(Model):
-    def __init__(self, vocab_size, embedding_dim, enc_units, batch_size):
-        super(MyEncoder, self).__init__()
-        self.vocab_size = vocab_size
-        self.batch_size = batch_size
-        self.enc_units = enc_units
-        self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.enc_units, return_state=True)
-
-    def call(self, x, hidden):
-        x = self.embedding(x)
-        output, state = self.gru(x, initial_state=hidden)
-        return output, state
-
-    def initialize_hidden_state(self):
-        return tf.zeros((self.batch_size, self.enc_units))
-
-    def get_config(self):
-        # to enable model saving as HDF5 format
-        return {'batch_size': self.batch_size,
-                'enc_units': self.enc_units}
-
-
 # TODO: Replace _ANS_ with your solution to create the encoder
-encoder = MyEncoder(_ANS_, embedding_dim=EMBEDDING_SIZE,
+encoder = MyEncoder(len(vocab_src), embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
 
 
 # Part 2: Decoder
-class MyDecoder(Model):
-    def __init__(self, vocab_size, embedding_dim, dec_units, batch_size):
-        super(MyDecoder, self).__init__()
-        self.batch_size = batch_size
-        self.dec_units = dec_units
-        self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
-        self.fc = Dense(vocab_size)
-
-    def call(self, x, hidden, enc_output):
-        # x shape after passing through embedding == (batch_size, 1, embedding_dim)
-        x = self.embedding(x)
-
-        # enc_output shape == (batch_size, encoding_dim)
-        # tf.expand_dims(enc_output, 1) shape == (batch_size, 1, encoding_dim)
-        # x shape after concatenation == (batch_size, 1, embedding_dim + encoding_dim)
-        x = tf.concat([tf.expand_dims(enc_output, 1), x], axis=-1)
-
-        # passing the concatenated vector to the GRU
-        output, state = self.gru(x)
-
-        # output shape == (batch_size * 1, hidden_size)
-        output = tf.reshape(output, (-1, output.shape[2]))
-
-        # output shape == (batch_size, vocab)
-        x = self.fc(output)
-
-        return x, state
-
-    def get_config(self):
-        # to enable model saving as HDF5 format
-        return {'batch_size': self.batch_size,
-                'dec_units': self.dec_units}
-
-
 # TODO: Replace _ANS_ with your solution to create the decoder
-decoder = MyDecoder(_ANS_, embedding_dim=EMBEDDING_SIZE,
+decoder = MyDecoder(len(vocab_tgt), embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
-
 
 # Part 3: Loss Function
 loss_equation = SparseCategoricalCrossentropy(from_logits=True, reduction='none')
@@ -192,19 +133,18 @@ def train(train_ds, val_ds, epochs, optimizer):
 
         # loop batches per epoch
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
-
             # TODO: perform training using the train_step function
             # Replace _ANS_ with your solution
-            batch_loss = _ANS_
+            batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
 
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
 
         val_loss = validate(val_ds)
 
-        print(f'>> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} '
+        print(f'>> {epoch + 1} Loss {(total_loss / (batch + 1)):.4f} '
               f'Val Loss {val_loss:.4f} Elapsed {time.time() - start_time:.4f} sec\n')
-        hist['loss'].append(total_loss / (batch+1))
+        hist['loss'].append(total_loss / (batch + 1))
         hist['val_loss'].append(val_loss)
 
     return hist
@@ -212,6 +152,7 @@ def train(train_ds, val_ds, epochs, optimizer):
 
 def validate(dataset):
     total_loss = 0
+    batch = 0
     for batch, (src_batch, tgt_batch) in enumerate(dataset):
         enc_hidden = [tf.zeros((BATCH_SIZE, BOTTLENECK_UNITS))]
         enc_output, enc_hidden = encoder(src_batch, enc_hidden)
@@ -231,31 +172,37 @@ def validate(dataset):
             dec_input = tf.expand_dims(predicted_id, 1)  # shape: (BATCH_SIZE, 1)
 
         total_loss += (loss / int(tgt_batch.shape[1]))
-    return total_loss/(batch+1)
+    return total_loss / (batch + 1)
 
 
 if __name__ == '__main__':
-    limit = 512  # experiment with smaller dataset sizes
-    train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src[:limit], seq_train_tgt[:limit]))
-    train_dataset = train_dataset.shuffle(1024).batch(BATCH_SIZE, drop_remainder=True)
-    val_dataset = tf.data.Dataset.from_tensor_slices((seq_val_src[:limit], seq_val_tgt[:limit]))
-    val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)
+    EPOCHS = 20
 
-    history = train(train_dataset, val_dataset, epochs=20, optimizer=tf.keras.optimizers.Adam())
+    train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src, seq_train_tgt))
+    train_dataset = train_dataset.shuffle(10*BATCH_SIZE) \
+        .repeat(EPOCHS) \
+        .batch(BATCH_SIZE)
+
+    val_dataset = tf.data.Dataset.from_tensor_slices((seq_val_src, seq_val_tgt))
+    val_dataset = val_dataset.batch(BATCH_SIZE, drop_remainder=True)  # make complete batches
+
+    history = train(train_dataset, val_dataset, epochs=EPOCHS,
+                    optimizer=tf.keras.optimizers.Adam())
 
     plt.plot(history['loss'], label='train')
     plt.plot(history['val_loss'], label='validation')
-    plt.legend()
-    plt.title('Learning Curve for Email Subject Translation')
+    plt.title('Learning Curve for Bible Translation')
     plt.xlabel('epochs')
     plt.ylabel('loss')
+    plt.legend()
     plt.savefig('learning_curve.png')
     plt.show()
 
-    # Save the model weights only
+    # Save the model weights and architecture
     model_path = '../app/demo/model'
     encoder.save_weights(f'{model_path}/encoder_weights.h5')
     decoder.save_weights(f'{model_path}/decoder_weights.h5')
+    copyfile('seq2seq.py', f'{model_path}/seq2seq.py')
 
     # Save the train source and target for creating the vectorizers
     # (Note: We'll recreate the vectorizers on deployment due to their limitations)
