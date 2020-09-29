@@ -57,16 +57,12 @@ print(f'Target Vocab size: {len(vocab_tgt)}')
 
 # Part 1b: Encoder
 # TODO: Replace _ANS_ with your solution to create the encoder
-encoder = MyEncoder(len(vocab_src), embedding_dim=EMBEDDING_SIZE,
-                    enc_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
+encoder = MyEncoder(_ANS_)
 
 
 # Part 2: Decoder
 # TODO: Replace _ANS_ with your solution to create the decoder
-decoder = MyDecoder(len(vocab_tgt), embedding_dim=EMBEDDING_SIZE,
-                    dec_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
+decoder = MyDecoder(_ANS_)
 
 # Part 3: Loss Function
 loss_equation = SparseCategoricalCrossentropy(from_logits=True, reduction='none')
@@ -135,7 +131,7 @@ def train(train_ds, val_ds, epochs, optimizer):
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
             # TODO: perform training using the train_step function
             # Replace _ANS_ with your solution
-            batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
+            batch_loss = _ANS_
 
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')

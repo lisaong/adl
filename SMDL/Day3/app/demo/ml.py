@@ -95,4 +95,4 @@ if __name__ == '__main__':
                         allow_pickle=True)
 
     for t in train_src[-10:]:
-        print(t, '=>', model.predict(t, prepend_tokens=False))
+        print(t, '\n\t\t=>', model.predict(t, prepend_tokens=False))
