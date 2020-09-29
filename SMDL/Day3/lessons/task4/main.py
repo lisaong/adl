@@ -53,19 +53,20 @@ src_vocab = src_vectorizer.get_vocabulary()
 print('Source Vocabulary', src_vocab)
 src_sequences = src_vectorizer(src_delimited)
 
-target_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
-target_vectorizer = get_vectorizer(target_delimited)
-target_vocab = target_vectorizer.get_vocabulary()
-print('Target Vocabulary', target_vocab)
-target_sequences = target_vectorizer(target_delimited)
+tgt_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
+tgt_vectorizer = get_vectorizer(tgt_delimited)
+tgt_vocab = tgt_vectorizer.get_vocabulary()
+print('Target Vocabulary', tgt_vocab)
+tgt_sequences = tgt_vectorizer(tgt_delimited)
 
 encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
                     enc_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
 
-decoder = MyDecoder(len(target_vocab), embedding_dim=EMBEDDING_SIZE,
+decoder = MyDecoder(len(tgt_vocab), embedding_dim=EMBEDDING_SIZE,
                     dec_units=BOTTLENECK_UNITS,
                     batch_size=BATCH_SIZE)
+
 
 # https://www.tensorflow.org/api_docs/python/tf/function
 # Compile the function into a Tensorflow graph
@@ -79,7 +80,7 @@ def train_step(source, target, enc_hidden, optimizer):
         dec_hidden = enc_hidden
 
         # set the start token
-        dec_input = tf.expand_dims([target_vocab.index(START_TOKEN)] * BATCH_SIZE, 1)
+        dec_input = tf.expand_dims([tgt_vocab.index(START_TOKEN)] * BATCH_SIZE, 1)
 
         # Teacher forcing - feeding the target as the next input
         for t in range(1, target.shape[1]):
@@ -106,34 +107,36 @@ def train_step(source, target, enc_hidden, optimizer):
     return batch_loss
 
 
-def train(epochs, batches_per_epoch, optimizer):
+def train(train_dataset, epochs, optimizer):
     # training loop
+
     loss_history = []
+
     for epoch in range(epochs):
         start_time = time.time()
 
         enc_hidden = encoder.initialize_hidden_state()
         total_loss = 0
 
-        # loop batches per epoch
-        for batch in range(batches_per_epoch):
-            # we are repeating the same target and source sequences in this toy example
-            batch_loss = train_step(src_sequences,
-                                    target_sequences,
-                                    enc_hidden, optimizer)
+        for batch, (src_batch, tgt_batch) in enumerate(train_dataset):
+            batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
             total_loss += batch_loss
             print(f'Epoch {epoch + 1} Batch {batch + 1} Loss {batch_loss.numpy():.4f}')
 
-        print(f'Epoch {epoch + 1} Loss {(total_loss / batches_per_epoch):.4f} Elapsed {time.time() - start_time} sec\n')
-        loss_history.append(total_loss / batches_per_epoch)
+        print(f'Epoch {epoch + 1} Loss {(total_loss / (batch+1)):.4f} Elapsed {time.time() - start_time} sec\n')
+        loss_history.append(total_loss / (batch+1))
 
     return loss_history
 
 
 if __name__ == '__main__':
-    loss_history = train(epochs=100, batches_per_epoch=20, optimizer=Adam())
+    # Create a batched dataset
+    dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
+    dataset = dataset.shuffle((len(src_sequences)+len(tgt_sequences))*256).batch(BATCH_SIZE)
 
-    plt.plot(loss_history)
+    history = train(dataset, epochs=2000, optimizer=Adam())
+
+    plt.plot(history)
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.savefig('learning_curve.png')
@@ -145,10 +148,10 @@ if __name__ == '__main__':
     decoder.save_weights('decoder_weights.h5')
 
     # save the artifacts
-    artifacts = {'src_vocab': src_vectorizer.get_vocabulary(),
+    artifacts = {'src_vocab': src_vocab,
                  'src_seq_len': src_sequences.numpy().shape[1],
-                 'target_vocab': target_vectorizer.get_vocabulary(),
-                 'target_seq_len': target_sequences.numpy().shape[1],
+                 'target_vocab': tgt_vocab,
+                 'target_seq_len': tgt_sequences.numpy().shape[1],
                  'start_token': START_TOKEN,
                  'end_token': END_TOKEN,
                  'embedding_size': EMBEDDING_SIZE,
