@@ -6,6 +6,7 @@
 # 3. Submit your completed train.py with learning_curve.png
 
 import pandas as pd
+import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import time
@@ -253,6 +254,8 @@ if __name__ == '__main__':
 
     # Save the model weights only
     # (Note: We'll recreate the vectorizers on deployment due to their limitations)
-    os.makedirs('../app/demo/model', exist_ok=True)
     encoder.save_weights('../app/demo/model/encoder_weights.h5')
     decoder.save_weights('../app/demo/model/decoder_weights.h5')
+    np.save('../app/demo/model/train_src.npy', train_src)
+    np.save('../app/demo/model/train_tgt.npy', train_tgt)
+
