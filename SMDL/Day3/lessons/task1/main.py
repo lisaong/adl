@@ -56,8 +56,12 @@ if __name__ == '__main__':  # so that we can import this file without running th
     encoder = MyEncoder(vocab_len, embedding_dim=EMBEDDING_SIZE,
                         enc_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
+
     sample_hidden = encoder.initialize_hidden_state()
     sample_output, sample_hidden = encoder(vectorizer(texts_delimited), sample_hidden)
+
+    print(encoder.summary())
+
     print(f'Encoder output shape: (batch size, sequence length, units) {sample_output.shape}')
 
     print('========================')

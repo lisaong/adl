@@ -73,6 +73,9 @@ if __name__ == '__main__':
                         batch_size=BATCH_SIZE)
     sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
                                                            sample_encoder_hidden, sample_encoder_output)
+
+    print(decoder.summary())
+
     print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
 
     print('========================')
