@@ -9,8 +9,8 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import pickle
 import time
-import os
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.layers import Embedding, GRU, Dense
@@ -253,9 +253,19 @@ if __name__ == '__main__':
     plt.show()
 
     # Save the model weights only
-    # (Note: We'll recreate the vectorizers on deployment due to their limitations)
-    encoder.save_weights('../app/demo/model/encoder_weights.h5')
-    decoder.save_weights('../app/demo/model/decoder_weights.h5')
-    np.save('../app/demo/model/train_src.npy', train_src)
-    np.save('../app/demo/model/train_tgt.npy', train_tgt)
+    model_path = '../app/demo/model'
+    encoder.save_weights(f'{model_path}/encoder_weights.h5')
+    decoder.save_weights(f'{model_path}/decoder_weights.h5')
 
+    # Save the train source and target for creating the vectorizers
+    # (Note: We'll recreate the vectorizers on deployment due to their limitations)
+    np.save(f'{model_path}/train_src.npy', train_src)
+    np.save(f'{model_path}/train_tgt.npy', train_tgt)
+
+    # save the artifacts
+    artifacts = {'start_token': START_TOKEN,
+                 'end_token': END_TOKEN,
+                 'embedding_size': EMBEDDING_SIZE,
+                 'batch_size': BATCH_SIZE,
+                 'bottleneck_units': BOTTLENECK_UNITS}
+    pickle.dump(artifacts, open(f'{model_path}/model_artifacts.pkl', 'wb'))
