@@ -5,8 +5,8 @@ import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
 # if calling this script directly
-#import sys
-#sys.path.append('model')
+import sys
+sys.path.append('model')
 #from seq2seq import MyEncoder, MyDecoder
 
 # if importing from view.py
