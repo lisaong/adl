@@ -54,11 +54,12 @@ class TFModel:
         self.decoder.load_weights(os.path.join(model_dir, 'decoder_weights.h5'))
         print(self.decoder.summary())
 
-    def predict(self, sentence: str):
+    def predict(self, sentence: str, prepend_tokens=True):
         result = ''
 
-        # prepend start and end token
-        sentence = f'{self.artifacts["start_token"]} {sentence} {self.artifacts["end_token"]}'
+        if prepend_tokens:
+            # prepend start and end token
+            sentence = f'{self.artifacts["start_token"]} {sentence} {self.artifacts["end_token"]}'
         inputs = self.vectorizer_src([sentence])
         inputs = tf.convert_to_tensor(inputs)
         vocab_tgt = self.vectorizer_tgt.get_vocabulary()
@@ -90,7 +91,8 @@ class TFModel:
 if __name__ == '__main__':
     model = TFModel(model_dir='model')
 
-    train_src = np.load(os.path.join('model', 'train_src.npy'), allow_pickle=True)
+    train_src = np.load(os.path.join('model', 'train_src.npy'),
+                        allow_pickle=True)
 
-    for t in train_src[:10]:
-        print(model.predict(t))
+    for t in train_src[-10:]:
+        print(t, '=>', model.predict(t, prepend_tokens=False))
