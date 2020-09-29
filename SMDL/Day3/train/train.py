@@ -220,8 +220,8 @@ def validate(dataset):
             loss += loss_function(src_batch[:, t], predictions)
 
             # the predicted id and decoder hidden state is fed back into the model
-            predicted_id = tf.argmax(predictions, axis=1).numpy() # ??
-            dec_input = tf.expand_dims([predicted_id], 0)
+            predicted_id = tf.argmax(predictions, axis=1)  # shape: (BATCH_SIZE)
+            dec_input = tf.expand_dims(predicted_id, 1)  # shape: (BATCH_SIZE, 1)
 
         total_loss += (loss / int(tgt_batch.shape[1]))
     return total_loss/(batch+1)
