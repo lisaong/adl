@@ -180,7 +180,8 @@ def validate(dataset):
 
 
 if __name__ == '__main__':
-    EPOCHS = 20
+    EPOCHS = 30
+    MODEL_PATH = '../app/demo/model'
 
     train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src, seq_train_tgt))
     train_dataset = train_dataset.shuffle(10*BATCH_SIZE) \
@@ -203,20 +204,20 @@ if __name__ == '__main__':
     plt.show()
 
     # Save the model weights and architecture
-    model_path = '../app/demo/model'
-    encoder.save_weights(f'{model_path}/encoder_weights.h5')
-    decoder.save_weights(f'{model_path}/decoder_weights.h5')
-    copyfile('seq2seq.py', f'{model_path}/seq2seq.py')
+    encoder.save_weights(f'{MODEL_PATH}/encoder_weights_e{EPOCHS}.h5')
+    decoder.save_weights(f'{MODEL_PATH}/decoder_weights_e{EPOCHS}.h5')
+    copyfile('seq2seq.py', f'{MODEL_PATH}/seq2seq.py')
 
     # Save the train source and target for creating the vectorizers
     # (Note: We'll recreate the vectorizers on deployment due to their limitations)
-    np.save(f'{model_path}/train_src.npy', train_src)
-    np.save(f'{model_path}/train_tgt.npy', train_tgt)
+    np.save(f'{MODEL_PATH}/train_src.npy', train_src)
+    np.save(f'{MODEL_PATH}/train_tgt.npy', train_tgt)
 
     # save the artifacts
     artifacts = {'start_token': START_TOKEN,
                  'end_token': END_TOKEN,
                  'embedding_size': EMBEDDING_SIZE,
                  'batch_size': BATCH_SIZE,
-                 'bottleneck_units': BOTTLENECK_UNITS}
-    pickle.dump(artifacts, open(f'{model_path}/model_artifacts.pkl', 'wb'))
+                 'bottleneck_units': BOTTLENECK_UNITS,
+                 'epochs': EPOCHS}
+    pickle.dump(artifacts, open(f'{MODEL_PATH}/model_artifacts.pkl', 'wb'))

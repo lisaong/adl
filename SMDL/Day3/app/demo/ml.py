@@ -7,10 +7,10 @@ from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 # if calling this script directly
 import sys
 sys.path.append('model')
-#from seq2seq import MyEncoder, MyDecoder
+from seq2seq import MyEncoder, MyDecoder
 
 # if importing from view.py
-from demo.model.seq2seq import MyEncoder, MyDecoder
+#from demo.model.seq2seq import MyEncoder, MyDecoder
 
 
 class TFModel:
@@ -42,7 +42,8 @@ class TFModel:
         sample_output, sample_hidden = self.encoder(tf.zeros((self.artifacts['batch_size'],
                                                               train_seq.numpy().shape[1])),
                                                     sample_hidden)
-        self.encoder.load_weights(os.path.join(model_dir, 'encoder_weights.h5'))
+        self.encoder.load_weights(os.path.join(model_dir,
+                                               f'encoder_weights_e{self.artifacts["epochs"]}.h5'))
         print(self.encoder.summary())
 
         vocab_tgt = vectorizer_tgt.get_vocabulary()
@@ -53,7 +54,8 @@ class TFModel:
         # call the model first to create the variables
         _ = self.decoder(tf.random.uniform((self.artifacts['batch_size'], 1)),
                          sample_hidden, sample_output)
-        self.decoder.load_weights(os.path.join(model_dir, 'decoder_weights.h5'))
+        self.decoder.load_weights(os.path.join(model_dir,
+                                               f'decoder_weights_e{self.artifacts["epochs"]}.h5'))
         print(self.decoder.summary())
 
     def predict(self, sentence: str, prepend_tokens=True):
