@@ -14,6 +14,8 @@ def default():
 @app.route('/reply', methods=['POST'])
 def reply_chat():
     text = request.form['reply']
+
+    # call the TFModel class to predict
     predictions = model.predict(text)
     print(predictions)
     return json.dumps({'predictions': predictions})

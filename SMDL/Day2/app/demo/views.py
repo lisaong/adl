@@ -22,6 +22,7 @@ def reply_chat():
     tokens = text.split()
     seed_word = random.sample(tokens, k=1)
 
+    # call the TFModel class to predict
     predictions = model.predict(seed_word)
     print(predictions)
     return json.dumps({'predictions': predictions})

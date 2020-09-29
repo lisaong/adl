@@ -4,11 +4,13 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
-import sys
+# if calling this script directly
+#import sys
+#sys.path.append('model')
+#from seq2seq import MyEncoder, MyDecoder
 
-sys.path.append('model')
-
-from seq2seq import MyEncoder, MyDecoder
+# if importing from view.py
+from demo.model.seq2seq import MyEncoder, MyDecoder
 
 
 class TFModel:
