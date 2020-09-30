@@ -86,11 +86,12 @@ class TFModel:
             # get the predicted id for the next word
             predictions, dec_hidden = self.decoder(dec_input, dec_hidden, enc_out)
             predicted_id = tf.argmax(predictions[0]).numpy()
-            result += vocab_tgt[predicted_id] + ' '
 
             # stop when we reach the end token
             if vocab_tgt[predicted_id] == self.artifacts['end_token']:
                 break
+
+            result += vocab_tgt[predicted_id] + ' '
 
             # the predicted id and decoder hidden state is fed back into the model
             dec_input = tf.expand_dims([predicted_id], 0)
