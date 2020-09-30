@@ -1,14 +1,14 @@
 ## Tokenizer
 
-Vectorize a text corpus, by turning each text into a sequence of integers (each integer being the index of a token in a dictionary). 
+Tokenizes a text corpus, by turning each text into a sequence of integers (each integer being the index of a token in a dictionary). 
 
 This is the predecessor for `tf.keras.layers.experimental.preprocessing.TextVectorization`. Unlike `TextVectorization`, this only performs tokenization.
 
 Note: besides a sequence of integers, other representations include binary, word count, and tfidf.
 
 The following settings are most commonly used:
-- num_words: if set, only returns the most common (`num_words-1`) words for each sequence. "Most common" is determined globally.
-- lower: whether to convert to lower-case
+- num_words: if set, only returns the most common (`num_words-1`) words for each sequence. "Most common" is determined globally (vocabularly-level). The vocabulary is setup by the call to `tokenizer.fit_on_texts()`.
+- lower: whether to convert to lower-case before tokenization.
 
 These are the default settings:
 ```
