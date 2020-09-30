@@ -91,7 +91,7 @@ def predict(sentence: str):
     for t in range(sequence_len_to_try):
         # get the predicted id for the next word
         predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
-        predicted_id = tf.argmax(predictions[0]).numpy()
+        predicted_id = tf.argmax(predictions[-1]).numpy()
         result += target_vectorizer.get_vocabulary()[predicted_id] + ' '
 
         # stop when we reach the end token
