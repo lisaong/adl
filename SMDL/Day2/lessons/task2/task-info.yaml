@@ -1,5 +1,5 @@
 type: theory
-custom_name: Tokenizer
+custom_name: Padding Sequences
 files:
 - name: main.py
   visible: true

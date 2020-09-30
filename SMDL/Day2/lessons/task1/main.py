@@ -2,6 +2,7 @@
 
 from tensorflow.keras.preprocessing.text import Tokenizer
 import numpy as np
+import json
 
 my_text = np.array(["Hello! this is a demonstration of Tokenizer.",
                     "Demonstration, is it really a?"])  # yoda speak
@@ -27,3 +28,7 @@ print('=======================')
 print('Conversion back to texts (sequences only contain the top num_words-1):')
 
 print(tokenizer.sequences_to_texts(sequences))
+
+print('=======================')
+
+print('Configuration as JSON', json.loads(tokenizer.to_json()))
