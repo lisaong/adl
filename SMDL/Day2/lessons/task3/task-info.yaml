@@ -5,3 +5,7 @@ files:
   visible: true
 - name: predictions.png
   visible: true
+- name: return_sequences.png
+  visible: true
+- name: stacked_rnn.png
+  visible: true
