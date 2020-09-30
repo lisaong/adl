@@ -78,8 +78,6 @@ if __name__ == '__main__':
                         dec_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
 
-    print('========================')
-
     dec_hidden = sample_encoder_hidden
 
     for t in range(0, sequences.shape[1]):
@@ -87,23 +85,16 @@ if __name__ == '__main__':
         # tf.expand_dims(sequences[:, t], 1) shape == (batch_size, 1, 1)
         dec_input = tf.expand_dims(sequences[:, t], 1)
 
-        print('Decoder input')
-        print(dec_input)
+        print('========================')
+        print(f'{t}: Decoder input: {dec_input}')
 
         dec_output, dec_hidden = decoder(dec_input, dec_hidden, sample_encoder_output)
+        print(f'{t}: Decoder output: {dec_output}')
 
-        print('========================')
-        print('Decoder output')
-        print(dec_output)
+        decoder_output_id = tf.argmax(dec_output[0]).numpy()
+        print(f'{t}: Decoder output (id): {decoder_output_id}')
 
-        print('Decoder output ids')
-        decoder_output_ids = tf.argmax(dec_output[:, -1]).numpy()
-        print(decoder_output_ids)
+        decoded_token = vectorizer.get_vocabulary()[decoder_output_id]
+        print(f'{t}: Decoder output (text): {decoded_token}')
 
-        print('Decoder output (text)')
-        decoded_tokens = vectorizer.get_vocabulary()[decoder_output_ids]
-        print(decoded_tokens)
-
-        print('========================')
-        print('Decoder hidden')
-        print(dec_hidden)  # passed back into the next call to the decoder
+        print(f'{t}: Decoder hidden: {dec_hidden}')  # passed back into the next call to the decoder
