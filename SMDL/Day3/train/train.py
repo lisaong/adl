@@ -129,6 +129,7 @@ def train(train_ds, val_ds, epochs, optimizer):
         total_loss = 0
 
         # loop batches per epoch
+        batch = 0
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
             # TODO: perform training using the train_step function
             # Replace _ANS_ with your solution
