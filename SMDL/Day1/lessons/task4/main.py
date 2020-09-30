@@ -1,4 +1,4 @@
-# LSTM demonstration
+# Sequence Learning demonstration
 # Note: you can replace LSTM with GRU
 import numpy as np
 import matplotlib.pyplot as plt

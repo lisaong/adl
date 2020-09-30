@@ -3,3 +3,5 @@ custom_name: Returning Sequences
 files:
 - name: main.py
   visible: true
+- name: predictions.png
+  visible: true
