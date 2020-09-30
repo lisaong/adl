@@ -37,12 +37,12 @@ def vectorize(train_texts: list, val_texts: list):
 
 
 # Part 1a: Vectorize
-df_train, df_val = get_data()
+df_train, df_val = get_data('../data')
 
-train_src = get_delimited_texts(df_train['english'])
-train_tgt = get_delimited_texts(df_train['german'])
-val_src = get_delimited_texts(df_val['english'])
-val_tgt = get_delimited_texts(df_val['german'])
+train_src = get_delimited_texts(df_train['source'])
+train_tgt = get_delimited_texts(df_train['target'])
+val_src = get_delimited_texts(df_val['source'])
+val_tgt = get_delimited_texts(df_val['target'])
 
 # vectorize
 vectorizer_src, seq_train_src, seq_val_src = vectorize(train_src, val_src)
@@ -173,7 +173,7 @@ def validate(dataset):
 
 
 if __name__ == '__main__':
-    EPOCHS = 30
+    EPOCHS = 20
     MODEL_PATH = '../app/demo/model'
 
     train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src, seq_train_tgt))
