@@ -1,5 +1,5 @@
 type: theory
-custom_name: LSTM
+custom_name: Learning Sequences
 files:
 - name: main.py
   visible: true

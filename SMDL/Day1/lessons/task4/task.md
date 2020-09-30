@@ -1,6 +1,6 @@
-## LSTMs as Sequence Learners
+## Learning Sequences
 
-An LSTM (or a GRU) can be used to learn a sequential function. 
+An Recurrent Neural Network  (LSTM or GRU) can be used to learn a sequential function. 
 
 `main.py` shows an example of an RNN used to predict the log(t) function, using a timestep of 3:
 ![predictions](predictions.png)
@@ -28,4 +28,5 @@ The following summarises how to setup the input shapes for learning time sequenc
 |Text|2-dimensional input of (batch, sequence_length), passed into an Embedding layer, which will convert it to a 3-dimensional input of (batch, sequence_length, word_vector_dimension)|
 
 Documentation:
-https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM
+- [tf.keras.layers.LSTM](https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM)
+- [tf.keras.layers.GRU](https://www.tensorflow.org/api_docs/python/tf/keras/layers/GRU)

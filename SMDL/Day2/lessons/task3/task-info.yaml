@@ -1,0 +1,5 @@
+type: theory
+custom_name: Returning Sequences
+files:
+- name: main.py
+  visible: true
