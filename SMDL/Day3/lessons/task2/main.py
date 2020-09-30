@@ -62,17 +62,37 @@ if __name__ == '__main__':
     texts_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
     vectorizer = TextVectorization()
     vectorizer.adapt(texts_delimited)
-    print('Vocabulary', vectorizer.get_vocabulary())
-    vocab_size = len(vectorizer.get_vocabulary())
+    vocab = vectorizer.get_vocabulary()
+    print('Vocabulary', vocab)
+    print('Vocabulary size', len(vocab))
+
+    print('========================')
+    print('Vectorized texts')
+    sequences = vectorizer(texts_delimited)
+    print(sequences)
 
     sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
     sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
 
-    decoder = MyDecoder(vocab_size, embedding_dim=EMBEDDING_SIZE,
+    decoder = MyDecoder(len(vocab), embedding_dim=EMBEDDING_SIZE,
                         dec_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
-    sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
-                                                           sample_encoder_hidden, sample_encoder_output)
+
+    print('========================')
+    # decode the first token of the text (after start token)
+    # during training and evaluation, this will be run on each token
+    target_token = sequences[:, 1]
+
+    # target_token shape == (batch_size, 1)
+    # tf.expand_dims(target_token, 1) shape == (batch_size, 1, 1)
+    dec_input = tf.expand_dims(target_token, 1)
+    print('Decoder input')
+    print(dec_input)
+
+    print('========================')
+    sample_decoder_output, sample_decoder_hidden = decoder(dec_input,
+                                                           sample_encoder_hidden,
+                                                           sample_encoder_output)
 
     print(decoder.summary())
 
@@ -81,6 +101,16 @@ if __name__ == '__main__':
     print('========================')
     print('Decoder output')
     print(sample_decoder_output)
+
+    print('========================')
+    print('Decoder output (vectorizer ids)')
+    sample_decoder_sequence = tf.argmax(sample_decoder_output).numpy()
+    print(sample_decoder_sequence)
+
+    print('========================')
+    print('Decoder output (text)')
+    sample_decoder_text = [vectorizer.get_vocabulary()[id] for id in sample_decoder_sequence]
+    print(sample_decoder_text)
 
     print('========================')
     print('Decoder hidden')
