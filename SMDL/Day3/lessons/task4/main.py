@@ -1,5 +1,4 @@
 # Toy RNN Encoder-Decoder: Part 4 - Training
-# https://www.tensorflow.org/tutorials/text/nmt_with_attention
 
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
