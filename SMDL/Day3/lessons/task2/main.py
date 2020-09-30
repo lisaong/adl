@@ -38,6 +38,7 @@ class MyDecoder(Model):
         output, state = self.gru(x)
 
         # output shape == (batch_size * 1, hidden_size)
+        # (same as Flatten)
         output = tf.reshape(output, (-1, output.shape[2]))
 
         # output shape == (batch_size, vocab)
@@ -89,12 +90,9 @@ if __name__ == '__main__':
         print(f'{t}: Decoder input: {dec_input}')
 
         dec_output, dec_hidden = decoder(dec_input, dec_hidden, sample_encoder_output)
-        print(f'{t}: Decoder output: {dec_output}')
+        print(f'{t}: Decoder output: {dec_output}')  # shape == (batch_size, vocab_size)
 
-        decoder_output_id = tf.argmax(dec_output[0]).numpy()
-        print(f'{t}: Decoder output (id): {decoder_output_id}')
-
-        decoded_token = vectorizer.get_vocabulary()[decoder_output_id]
-        print(f'{t}: Decoder output (text): {decoded_token}')
+        decoder_output_ids = tf.argmax(dec_output, axis=-1).numpy()
+        print(f'{t}: Decoder output (ids): {decoder_output_ids}')  # shape == (batch_size,)
 
         print(f'{t}: Decoder hidden: {dec_hidden}')  # passed back into the next call to the decoder
