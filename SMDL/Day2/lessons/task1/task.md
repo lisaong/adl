@@ -1,26 +1,24 @@
-## Text Vectorization
-Text vectorization performs pre-processing to convert words into numbers.
+## Tokenizer
 
-It typically performs two steps:
-1. vectorizer.adapt(corpus): One-time initialization. **Generates the vocabulary** based on the unique words of the **corpus**, subject to a limit of `max_tokens`.
-2. vectorizer(text): Performs the **vectorization** on **any input text**. This typically does pre-processing (tokenization based on whitespace, stripping of punctuation, lower-casing, and padding/truncation to a fixed `output_sequence_length`) before replacing each 
-tokenized word with its index into the vocabulary. Any new words not in the vocabulary will be assumed to be `[UNK]` (out-of-vocab).
+Vectorize a text corpus, by turning each text into a sequence of integers (each integer being the index of a token in a dictionary). 
 
-![vectorization](vectorization.png)
+This is the predecessor for `tf.keras.layers.experimental.preprocessing.TextVectorization`. Unlike `TextVectorization`, this only performs tokenization.
 
-The following settings are most commonly used for vectorization:
-- max_tokens: limits the size of the vocabulary. This does not include the padding token ('') and the out-of-vocabulary token ([Unk]). If not set, this will default to the number of unique tokens in all texts.
-- output_sequence_length: limits the length of the output sequences. Each row of text will be truncated or zero-padded to match this length. If not set, this will default to the longest sequence.
+Note: besides a sequence of integers, other representations include binary, word count, and tfidf.
+
+The following settings are most commonly used:
+- num_words: limits the size of the vocabulary. 
+- lower: whether to convert to lower-case
 
 These are the default settings:
 ```
-tf.keras.layers.experimental.preprocessing.TextVectorization(
-    max_tokens=None, standardize=LOWER_AND_STRIP_PUNCTUATION,
-    split=SPLIT_ON_WHITESPACE, ngrams=None, output_mode=INT,
-    output_sequence_length=None, pad_to_max_tokens=True, **kwargs
-)
+tf.keras.preprocessing.text.Tokenizer(
+    num_words=None, filters='!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n', lower=True,
+    split=' ', char_level=False, oov_token=None, document_count=0, **kwargs)
 ```
 ### Usage Notes
-`TextVectorization` provides a quick way to convert text to sequences as input to the neural network. If you need to convert back from numeric sequences to text, you can refer to Day2's code, where we will use `tensorflow.keras.preprocessing.text.Tokenizer` to do the conversion in both directions (`tensorflow.keras.preprocessing.text.Tokenizer` is slightly more complicated to use because it does not do padding).
+- By default, all punctuation is removed (see `filters`), turning the texts into space-separated sequences of words (see `split=' '`). These sequences are then split into lists of tokens. They will then be indexed or vectorized.
+- 0 is a reserved index that won't be assigned to any word. This is usually assigned to out-of-vocab words.
+- `TextVectorization` (refer to Day1) is a high-level API to provide a quick way to convert text to sequences as input to the neural network (it does everything including padding). If you need to convert back from numeric sequences to text, the `Tokenizer` is recommended because it can do the conversion in both directions (at the expense of having to do padding yourself using `tensorflow.keras.preprocessing.sequence.pad_sequences`). The next lesson will cover `pad_sequences`.
 
-[Documentation](https://www.tensorflow.org/api_docs/python/tf/keras/layers/experimental/preprocessing/TextVectorization)
+[Documentation](https://www.tensorflow.org/api_docs/python/tf/keras/preprocessing/text/Tokenizer)
