@@ -1,19 +1,29 @@
-# Vectorizer demonstration
+# Tokenizer demonstration
 
-from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
+from tensorflow.keras.preprocessing.text import Tokenizer
 import numpy as np
 
-my_text = np.array(["Hello! this is a demonstration of Text Vectorization"])
+my_text = np.array(["Hello! this is a demonstration of Tokenizer.",
+                    "Demonstration, is it really a?"])  # yoda speak
 
-vectorizer = TextVectorization(max_tokens=100, output_sequence_length=10)
-vectorizer.adapt(my_text)
+tokenizer = Tokenizer(num_words=5, lower=True)
+tokenizer.fit_on_texts(my_text)
+
+sequences = tokenizer.texts_to_sequences(my_text)
 
 print('=======================')
 
 print('Original Text', my_text)
 
-print('Vectorized sequence', vectorizer(my_text))
+print('Tokenized sequences', sequences)
 
 print('=======================')
 
-print('Vocabulary', vectorizer.get_vocabulary())
+print('Vocabulary', tokenizer.word_index)
+print('Word counts', tokenizer.word_counts)
+
+print('=======================')
+
+print('Conversion back to texts (sequences only contain the top num_words-1):')
+
+print(tokenizer.sequences_to_texts(sequences))

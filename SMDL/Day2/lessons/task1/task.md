@@ -7,7 +7,7 @@ This is the predecessor for `tf.keras.layers.experimental.preprocessing.TextVect
 Note: besides a sequence of integers, other representations include binary, word count, and tfidf.
 
 The following settings are most commonly used:
-- num_words: limits the size of the vocabulary. 
+- num_words: if set, only returns the most common (`num_words-1`) words for each sequence. "Most common" is determined globally.
 - lower: whether to convert to lower-case
 
 These are the default settings:
