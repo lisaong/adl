@@ -3,3 +3,5 @@ custom_name: Loss Function
 files:
 - name: main.py
   visible: true
+- name: scce.png
+  visible: true
