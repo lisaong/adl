@@ -1,0 +1,5 @@
+type: theory
+custom_name: Frame Generator
+files:
+- name: frame_generator.py
+  visible: true
