@@ -87,8 +87,8 @@ def predict(sentence: str):
     dec_hidden = enc_hidden
     dec_input = tf.expand_dims([target_start_token_index], 0)
 
-    sequence_len_to_try = 10
-    for t in range(sequence_len_to_try):
+    max_target_sequence_length = 10
+    for t in range(max_target_sequence_length):
         # get the predicted id for the next word
         predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
         predicted_id = tf.argmax(predictions[-1]).numpy()
