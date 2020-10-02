@@ -9,7 +9,7 @@ Many videos are 30 or 60fps. If our video is 30 frames per second (30fps):
  - Every 3rd frame appears at 33.3ms * 3 = 100ms intervals
  - A sequence length of 20 frames accounts for 20 * 100ms = 2s of footage
 
-Of course, we don't have to skip frames and can use every frame of the video "as is". Skipping frames is useful when the video is not capturing high-speed activities, and we want our RNNs to see acriss a longer time interval.
+Of course, we don't have to skip frames and can use every frame of the video "as is". Skipping frames is useful when the video is not capturing high-speed activities, and we want our RNNs to see across a longer time interval.
 
 The pre-processing will use the `preprocess_input` function of a pre-trained ImageNet model [MobileNetV2](https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2). The end goal is to do some transfer learning using Parameter Extraction of a CNN, and then pass the sequence of extracted CNN image features to an RNN to perform classification.
 
