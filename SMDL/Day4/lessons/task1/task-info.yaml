@@ -5,3 +5,5 @@ files:
   visible: true
 - name: task.md
   visible: true
+- name: frames.png
+  visible: true
