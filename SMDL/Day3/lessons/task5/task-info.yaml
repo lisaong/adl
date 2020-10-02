@@ -3,3 +3,5 @@ custom_name: Predict
 files:
 - name: predict.py
   visible: true
+- name: predict.png
+  visible: true
