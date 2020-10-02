@@ -17,5 +17,6 @@ Given an input source text:
     b. The decoder returns the **predictions** and the **decoder hidden state**.
     
     c. Apply argmax to get the predicted label from the **predictions**.
-      *  If the predicted label is the end token, exit the loop and return the **predicted target sequence**.
+      *  If the predicted label is the end token, exit the loop. We have completed the **predicted target sequence**.
       *  Else, append the predicted label to the **predicted target sequence**. Set the predicted label as the **decoder input**, this will be passed back into the decoder for the next token.
+      

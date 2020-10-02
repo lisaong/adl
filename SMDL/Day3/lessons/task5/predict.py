@@ -9,8 +9,8 @@ import pickle
 import sys
 
 sys.path.append('..')
-from task1.main import MyEncoder
-from task2.main import MyDecoder
+from task1.encoder import MyEncoder
+from task2.decoder import MyDecoder
 
 
 # source text

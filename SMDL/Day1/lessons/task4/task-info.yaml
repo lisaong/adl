@@ -1,7 +1,7 @@
 type: theory
 custom_name: Learning Sequences
 files:
-- name: main.py
+- name: learning_sequences.py
   visible: true
 - name: predictions.png
   visible: true

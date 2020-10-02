@@ -2,7 +2,7 @@
 
 An Recurrent Neural Network  (LSTM or GRU) can be used to learn a sequential function. 
 
-`main.py` shows an example of an RNN used to predict the log(t) function, using a timestep of 3:
+`learning_sequences.py` shows an example of an RNN used to predict the log(t) function, using a timestep of 3:
 ![predictions](predictions.png)
 
 Architecture:

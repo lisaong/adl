@@ -1,7 +1,7 @@
 type: theory
 custom_name: Word Embeddings
 files:
-- name: main.py
+- name: word_embeddings.py
   visible: true
 - name: vectors.png
   visible: true

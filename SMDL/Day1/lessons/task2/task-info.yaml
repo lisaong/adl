@@ -1,5 +1,5 @@
 type: theory
 custom_name: Labels to Categorical
 files:
-- name: main.py
+- name: labels_to_categorical.py
   visible: true

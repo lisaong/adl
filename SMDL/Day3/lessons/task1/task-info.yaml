@@ -1,7 +1,7 @@
 type: theory
 custom_name: Encoder
 files:
-- name: main.py
+- name: encoder.py
   visible: true
 - name: encoder.png
   visible: true

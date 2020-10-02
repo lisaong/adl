@@ -1,5 +1,5 @@
 type: theory
 custom_name: Predict
 files:
-- name: main.py
+- name: predict.py
   visible: true

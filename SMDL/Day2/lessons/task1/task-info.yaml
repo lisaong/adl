@@ -1,5 +1,5 @@
 type: theory
 custom_name: Tokenizer
 files:
-- name: main.py
+- name: tokenizer.py
   visible: true

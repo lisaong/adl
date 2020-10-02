@@ -16,7 +16,7 @@ The training process is as follows:
     
 3. The overall loss is summed up across target tokens for the batch, and used to calculate the gradients for backpropagation of the encoder and decoder weights.
 
-Learning curve after training for 2000 epochs on the toy dataset:
+Learning curve after training for 500 epochs on the toy dataset (since it's a toy dataset for demo purposes, there's no validation set):
 
 ![learning_curve](learning_curve.png)
 

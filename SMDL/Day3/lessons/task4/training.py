@@ -12,9 +12,9 @@ import pickle
 import sys
 
 sys.path.append('..')
-from task1.main import MyEncoder
-from task2.main import MyDecoder
-from task3.main import loss_function
+from task1.encoder import MyEncoder
+from task2.decoder import MyDecoder
+from task3.loss_function import loss_function
 
 # source text
 english_text = ['Ask, and it will be given to you',
@@ -123,19 +123,21 @@ def train(train_dataset, epochs, optimizer):
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
 
-        print(f'>> {epoch + 1} Loss {(total_loss / (batch+1)):.4f} Elapsed {time.time() - start_time:.4f} sec')
-        loss_history.append(total_loss / (batch+1))
+        print(f'>> {epoch + 1} Loss {(total_loss / (batch + 1)):.4f} Elapsed {time.time() - start_time:.4f} sec')
+        loss_history.append(total_loss / (batch + 1))
 
     return loss_history
 
 
 if __name__ == '__main__':
-    # Create a batched dataset
+    # Create a batched dataset from our sequences
+    BATCHES_PER_EPOCH = 5
     dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
-    dataset = dataset.shuffle((len(src_sequences)+len(tgt_sequences))*256).batch(BATCH_SIZE,
-                                                                                 drop_remainder=True)
+    dataset = dataset.shuffle(1024)\
+        .batch(BATCH_SIZE)\
+        .repeat(BATCHES_PER_EPOCH)
 
-    history = train(dataset, epochs=2000, optimizer=Adam())
+    history = train(dataset, epochs=500, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
@@ -159,4 +161,3 @@ if __name__ == '__main__':
                  'batch_size': BATCH_SIZE,
                  'bottleneck_units': BOTTLENECK_UNITS}
     pickle.dump(artifacts, open('model_artifacts.pkl', 'wb'))
-

@@ -7,4 +7,4 @@ Sparse Categorical Cross Entropy (SCCE) function differs from the Categorical Cr
 
 ![scce](scce.png)
 
-Besides the Sparse Categorical Cross Entropy Loss, we can define a custom loss function that handles special conditions, such as not penalising the loss when the target token is a padding token. See `main.py` for how this is done. A padding token just means that the target sequence is shorter than the max sequence length (determined by the source vectorizer).
+Besides the Sparse Categorical Cross Entropy Loss, we can define a custom loss function that handles special conditions, such as not penalising the loss when the target token is a padding token. See `loss_function.py` for how this is done. A padding token just means that the target sequence is shorter than the max sequence length (determined by the source vectorizer).
