@@ -1,7 +1,9 @@
 type: theory
 custom_name: Training
 files:
-- name: main.py
+- name: training.py
   visible: true
 - name: learning_curve.png
+  visible: true
+- name: training.png
   visible: true

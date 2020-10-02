@@ -1,5 +1,4 @@
 # Toy RNN Encoder-Decoder (Part 1: Encoder)
-# https://www.tensorflow.org/tutorials/text/nmt_with_attention
 
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
@@ -53,12 +52,18 @@ if __name__ == '__main__':  # so that we can import this file without running th
     print('Vocabulary', vectorizer.get_vocabulary())
     vocab_len = len(vectorizer.get_vocabulary())
 
+    print('========================')
+    print('Vectorized texts')
+    sequences = vectorizer(texts_delimited)
+    print(sequences)
+
+    print('========================')
     encoder = MyEncoder(vocab_len, embedding_dim=EMBEDDING_SIZE,
                         enc_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
 
     sample_hidden = encoder.initialize_hidden_state()
-    sample_output, sample_hidden = encoder(vectorizer(texts_delimited), sample_hidden)
+    sample_output, sample_hidden = encoder(sequences, sample_hidden)
 
     print(encoder.summary())
 

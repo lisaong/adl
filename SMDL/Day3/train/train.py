@@ -22,7 +22,7 @@ START_TOKEN = 'aaaaaa'
 END_TOKEN = 'zzzzzz'
 
 BATCH_SIZE = 16
-EMBEDDING_SIZE = 16
+EMBEDDING_SIZE = 10
 BOTTLENECK_UNITS = 8
 
 
@@ -37,12 +37,12 @@ def vectorize(train_texts: list, val_texts: list):
 
 
 # Part 1a: Vectorize
-df_train, df_val = get_data()
+df_train, df_val = get_data('../data')
 
-train_src = get_delimited_texts(df_train['english'])
-train_tgt = get_delimited_texts(df_train['greek'])
-val_src = get_delimited_texts(df_val['english'])
-val_tgt = get_delimited_texts(df_val['greek'])
+train_src = get_delimited_texts(df_train['source'])
+train_tgt = get_delimited_texts(df_train['target'])
+val_src = get_delimited_texts(df_val['source'])
+val_tgt = get_delimited_texts(df_val['target'])
 
 # vectorize
 vectorizer_src, seq_train_src, seq_val_src = vectorize(train_src, val_src)
@@ -57,12 +57,13 @@ print(f'Target Vocab size: {len(vocab_tgt)}')
 
 # Part 1b: Encoder
 # TODO: Replace _ANS_ with your solution to create the encoder
-encoder = MyEncoder(_ANS_)
+encoder = _ANS_
 
 
 # Part 2: Decoder
 # TODO: Replace _ANS_ with your solution to create the decoder
-decoder = MyDecoder(_ANS_)
+decoder = _ANS_
+
 
 # Part 3: Loss Function
 loss_equation = SparseCategoricalCrossentropy(from_logits=True, reduction='none')
@@ -128,6 +129,7 @@ def train(train_ds, val_ds, epochs, optimizer):
         total_loss = 0
 
         # loop batches per epoch
+        batch = 0
         for batch, (src_batch, tgt_batch) in enumerate(train_ds):
             # TODO: perform training using the train_step function
             # Replace _ANS_ with your solution
@@ -173,6 +175,7 @@ def validate(dataset):
 
 if __name__ == '__main__':
     EPOCHS = 20
+    MODEL_PATH = '../app/demo/model'
 
     train_dataset = tf.data.Dataset.from_tensor_slices((seq_train_src, seq_train_tgt))
     train_dataset = train_dataset.shuffle(10*BATCH_SIZE) \
@@ -195,20 +198,20 @@ if __name__ == '__main__':
     plt.show()
 
     # Save the model weights and architecture
-    model_path = '../app/demo/model'
-    encoder.save_weights(f'{model_path}/encoder_weights.h5')
-    decoder.save_weights(f'{model_path}/decoder_weights.h5')
-    copyfile('seq2seq.py', f'{model_path}/seq2seq.py')
+    encoder.save_weights(f'{MODEL_PATH}/encoder_weights_e{EPOCHS}.h5')
+    decoder.save_weights(f'{MODEL_PATH}/decoder_weights_e{EPOCHS}.h5')
+    copyfile('seq2seq.py', f'{MODEL_PATH}/seq2seq.py')
 
     # Save the train source and target for creating the vectorizers
     # (Note: We'll recreate the vectorizers on deployment due to their limitations)
-    np.save(f'{model_path}/train_src.npy', train_src)
-    np.save(f'{model_path}/train_tgt.npy', train_tgt)
+    np.save(f'{MODEL_PATH}/train_src.npy', train_src)
+    np.save(f'{MODEL_PATH}/train_tgt.npy', train_tgt)
 
     # save the artifacts
     artifacts = {'start_token': START_TOKEN,
                  'end_token': END_TOKEN,
                  'embedding_size': EMBEDDING_SIZE,
                  'batch_size': BATCH_SIZE,
-                 'bottleneck_units': BOTTLENECK_UNITS}
-    pickle.dump(artifacts, open(f'{model_path}/model_artifacts.pkl', 'wb'))
+                 'bottleneck_units': BOTTLENECK_UNITS,
+                 'epochs': EPOCHS}
+    pickle.dump(artifacts, open(f'{MODEL_PATH}/model_artifacts.pkl', 'wb'))

@@ -1,7 +1,7 @@
 type: theory
 custom_name: Text Vectorization
 files:
-- name: main.py
+- name: text_vectorization.py
   visible: true
 - name: vectorization.png
   visible: true

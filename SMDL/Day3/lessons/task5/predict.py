@@ -1,3 +1,5 @@
+# Toy RNN Encoder-Decoder: Part 5 - Predict
+
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 import pickle
@@ -7,8 +9,8 @@ import pickle
 import sys
 
 sys.path.append('..')
-from task1.main import MyEncoder
-from task2.main import MyDecoder
+from task1.encoder import MyEncoder
+from task2.decoder import MyDecoder
 
 
 # source text
@@ -19,6 +21,7 @@ english_text = ['Ask, and it will be given to you',
                 'and he who seeks finds',
                 'and to him who knocks it will be opened']
 
+# load the previously trained model artifacts
 model_artifacts = pickle.load(open('../task4/model_artifacts.pkl', 'rb'))
 
 BATCH_SIZE = model_artifacts['batch_size']
@@ -85,11 +88,11 @@ def predict(sentence: str):
     dec_hidden = enc_hidden
     dec_input = tf.expand_dims([target_start_token_index], 0)
 
-    sequence_len_to_try = 10
-    for t in range(sequence_len_to_try):
+    max_target_sequence_length = 10
+    for t in range(max_target_sequence_length):
         # get the predicted id for the next word
         predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
-        predicted_id = tf.argmax(predictions[0]).numpy()
+        predicted_id = tf.argmax(predictions[-1]).numpy()
         result += target_vectorizer.get_vocabulary()[predicted_id] + ' '
 
         # stop when we reach the end token

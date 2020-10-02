@@ -1,0 +1,11 @@
+type: theory
+custom_name: Returning Sequences
+files:
+- name: returning_sequences.py
+  visible: true
+- name: predictions.png
+  visible: true
+- name: return_sequences.png
+  visible: true
+- name: stacked_rnn.png
+  visible: true

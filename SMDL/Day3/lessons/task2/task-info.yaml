@@ -1,5 +1,7 @@
 type: theory
 custom_name: Decoder
 files:
-- name: main.py
+- name: decoder.py
+  visible: true
+- name: decoder.png
   visible: true

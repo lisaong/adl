@@ -38,6 +38,7 @@ class MyDecoder(Model):
         output, state = self.gru(x)
 
         # output shape == (batch_size * 1, hidden_size)
+        # (same as Flatten)
         output = tf.reshape(output, (-1, output.shape[2]))
 
         # output shape == (batch_size, vocab)
@@ -62,26 +63,36 @@ if __name__ == '__main__':
     texts_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
     vectorizer = TextVectorization()
     vectorizer.adapt(texts_delimited)
-    print('Vocabulary', vectorizer.get_vocabulary())
-    vocab_size = len(vectorizer.get_vocabulary())
+    vocab = vectorizer.get_vocabulary()
+    print('Vocabulary', vocab)
+    print('Vocabulary size', len(vocab))
+
+    print('========================')
+    print('Vectorized texts')
+    sequences = vectorizer(texts_delimited)
+    print(sequences)
 
     sample_encoder_output = np.array([[-0.00256194], [-0.00898881], [-0.00391034]], dtype=np.float32)
     sample_encoder_hidden = np.array([[-0.00156194], [0.00020050], [-0.00095034]], dtype=np.float32)
 
-    decoder = MyDecoder(vocab_size, embedding_dim=EMBEDDING_SIZE,
+    decoder = MyDecoder(len(vocab), embedding_dim=EMBEDDING_SIZE,
                         dec_units=BOTTLENECK_UNITS,
                         batch_size=BATCH_SIZE)
-    sample_decoder_output, sample_decoder_hidden = decoder(tf.random.uniform((BATCH_SIZE, 1)),
-                                                           sample_encoder_hidden, sample_encoder_output)
 
-    print(decoder.summary())
+    dec_hidden = sample_encoder_hidden
 
-    print(f'Decoder output shape: (batch_size, vocab size) {sample_decoder_output.shape}')
+    for t in range(0, sequences.shape[1]):
+        # sequences[:, t] shape == (batch_size, 1)
+        # tf.expand_dims(sequences[:, t], 1) shape == (batch_size, 1, 1)
+        dec_input = tf.expand_dims(sequences[:, t], 1)
 
-    print('========================')
-    print('Decoder output')
-    print(sample_decoder_output)
+        print('========================')
+        print(f'{t}: Decoder input: {dec_input}')
 
-    print('========================')
-    print('Decoder hidden')
-    print(sample_decoder_hidden) # this will be passed back into the next call to the decoder
+        dec_output, dec_hidden = decoder(dec_input, dec_hidden, sample_encoder_output)
+        print(f'{t}: Decoder output: {dec_output}')  # shape == (batch_size, vocab_size)
+
+        decoder_output_ids = tf.argmax(dec_output, axis=-1).numpy()
+        print(f'{t}: Decoder output (ids): {decoder_output_ids}')  # shape == (batch_size,)
+
+        print(f'{t}: Decoder hidden: {dec_hidden}')  # passed back into the next call to the decoder

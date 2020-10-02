@@ -1,11 +1,13 @@
-# LSTM demonstration
+# Sequence Learning demonstration
+# Note: you can replace LSTM with GRU
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, LSTM, Dense
 
-# using LSTM to learn this function
+
+# We will learn this function
 def f(t):
     return np.log(t)
 
@@ -33,7 +35,7 @@ X_rnn = X.reshape(X.shape[0], sequence_len, n_features)
 
 # define the model
 model_input = Input(shape=(sequence_len, n_features,))
-x = LSTM(8, activation='relu')(model_input)
+x = LSTM(8, activation='relu')(model_input)  # can also use GRU here
 x = Dense(1)(x)
 model = Model(model_input, x)
 model.summary()

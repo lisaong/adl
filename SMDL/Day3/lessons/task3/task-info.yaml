@@ -1,5 +1,7 @@
 type: theory
 custom_name: Loss Function
 files:
-- name: main.py
+- name: loss_function.py
+  visible: true
+- name: scce.png
   visible: true

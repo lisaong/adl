@@ -4,11 +4,20 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
+import imp
 import sys
 
 sys.path.append('model')
+try:
+    imp.find_module('seq2seq')
+    found = True
+except ImportError:
+    found = False
 
-from seq2seq import MyEncoder, MyDecoder
+if found: # testing only
+    from seq2seq import MyEncoder, MyDecoder
+else: # run from flask app
+    from demo.model.seq2seq import MyEncoder, MyDecoder
 
 
 class TFModel:
@@ -40,7 +49,8 @@ class TFModel:
         sample_output, sample_hidden = self.encoder(tf.zeros((self.artifacts['batch_size'],
                                                               train_seq.numpy().shape[1])),
                                                     sample_hidden)
-        self.encoder.load_weights(os.path.join(model_dir, 'encoder_weights.h5'))
+        self.encoder.load_weights(os.path.join(model_dir,
+                                               f'encoder_weights_e{self.artifacts["epochs"]}.h5'))
         print(self.encoder.summary())
 
         vocab_tgt = vectorizer_tgt.get_vocabulary()
@@ -51,7 +61,8 @@ class TFModel:
         # call the model first to create the variables
         _ = self.decoder(tf.random.uniform((self.artifacts['batch_size'], 1)),
                          sample_hidden, sample_output)
-        self.decoder.load_weights(os.path.join(model_dir, 'decoder_weights.h5'))
+        self.decoder.load_weights(os.path.join(model_dir,
+                                               f'decoder_weights_e{self.artifacts["epochs"]}.h5'))
         print(self.decoder.summary())
 
     def predict(self, sentence: str, prepend_tokens=True):
@@ -75,11 +86,12 @@ class TFModel:
             # get the predicted id for the next word
             predictions, dec_hidden = self.decoder(dec_input, dec_hidden, enc_out)
             predicted_id = tf.argmax(predictions[0]).numpy()
-            result += vocab_tgt[predicted_id] + ' '
 
             # stop when we reach the end token
             if vocab_tgt[predicted_id] == self.artifacts['end_token']:
                 break
+
+            result += vocab_tgt[predicted_id] + ' '
 
             # the predicted id and decoder hidden state is fed back into the model
             dec_input = tf.expand_dims([predicted_id], 0)
