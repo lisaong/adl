@@ -140,8 +140,8 @@ if __name__ == '__main__':
     plt.plot(history)
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    plt.savefig('learning_curve.png')
     plt.title('learning curve')
+    plt.savefig('learning_curve.png')
     plt.show()
 
     # save the model weights

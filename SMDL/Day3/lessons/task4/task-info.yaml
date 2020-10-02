@@ -5,3 +5,5 @@ files:
   visible: true
 - name: learning_curve.png
   visible: true
+- name: training.png
+  visible: true

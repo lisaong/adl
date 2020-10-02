@@ -1,12 +1,17 @@
 ## Part 4: Training
 
+![training](training.png)
+
 The training process is as follows:
 
-1. Pass the input through the encoder which return encoder output and the encoder hidden state.
-2. The encoder output, encoder hidden state and the decoder input (which is the start token) is passed to the decoder.
-3. The decoder returns the predictions and the decoder hidden state.
-4. The decoder hidden state is then passed back into the model and the predictions are used to calculate the loss.
-5. Use teacher forcing to decide the next input to the decoder. Teacher forcing is the technique where the target word is passed as the next input to the decoder.
-6. The final step is to calculate the gradients and apply it to the optimizer and do backpropagation.
+1. Pass the **sequence input** and **previous (batch) encoder hidden state** through the encoder which returns the **encoded output** and the **encoder hidden state**.
+2. Use "Teacher Forcing" to decide the next input to the decoder. Teacher Forcing is the technique where each target token is passed as the input to the decoder.
+    a. The **encoded output**, **encoder hidden state** and the **decoder input** (which is each target token) is passed to the decoder.
+    b. The decoder returns the predictions and the decoder hidden state.
+    c. The decoder hidden state is then passed back into the model and the predictions are used to calculate the loss.
+4. The overall loss is summed up across all target tokens, and used to calculate the gradients for backpropagation of the encoder and decoder weights.
+
+![learning_curve](learning_curve.png)
+
 
 [Reference](https://www.tensorflow.org/tutorials/text/nmt_with_attention)
