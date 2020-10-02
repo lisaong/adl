@@ -21,6 +21,7 @@ english_text = ['Ask, and it will be given to you',
                 'and he who seeks finds',
                 'and to him who knocks it will be opened']
 
+# load the previously trained model artifacts
 model_artifacts = pickle.load(open('../task4/model_artifacts.pkl', 'rb'))
 
 BATCH_SIZE = model_artifacts['batch_size']
