@@ -27,7 +27,7 @@ def predict():
     print(prediction, probability)
 
     base_url = url_for('default', _external=True)
-    filename_url = f'{base_url}/uploads/{filename}'
+    filename_url = f'{base_url}uploads/{filename}'
     print(filename_url)
 
     return render_template('result.html',
