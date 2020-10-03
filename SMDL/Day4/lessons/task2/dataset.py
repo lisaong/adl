@@ -76,12 +76,20 @@ if __name__ == "__main__":
 
     # inspect some data
     print('========================================')
-    print('sample training data')
-    data, label = train_ds.take(1)
-    plot_images(data.numpy(), title=label, output_filename=f'training_{label}.png')
-
+    print('1 batch of training data')
+    train_samples = list(train_ds.take(1).as_numpy_iterator())
+    train_batch = train_samples[0]
+    print('train data shape:', train_batch[0].shape)  # data of the first batch
+    print('train labels shape:', train_batch[1].shape)  # labels of the first batch
 
     print('========================================')
-    print('sample validation data')
-    data, label = val_ds.take(1)
-    plot_images(data.numpy(), title=label, output_filename=f'val_{label}.png')
+    print('1 row of sample validation data')
+    val_samples = list(val_ds.take(1).as_numpy_iterator())
+    val_sample = val_samples[0]
+    print('val data shape:', val_sample[0].shape)  # data of the first row
+    print('val labels shape:', val_sample[1].shape)  # labels of the first row
+
+    print('========================================')
+    print('Saving dataset')
+    np.save('X.npy', X)
+    np.save('y.npy', y)
