@@ -39,7 +39,8 @@ def create_model(h, w, c):
 
 
 if __name__ == "__main__":
-    # load dataset saved from previous task
+    # load dataset saved from previous task.
+    # Note: you need to run the previous lessons in sequence to get this file.
     X = np.load('../task2/X.npy', allow_pickle=True)
     y = np.load('../task2/y.npy', allow_pickle=True)
 
