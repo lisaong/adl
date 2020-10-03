@@ -1,9 +1,11 @@
 type: theory
 custom_name: Extract Video Frames
 files:
-- name: frame_extractor.py
-  visible: true
 - name: task.md
   visible: true
 - name: frames.png
   visible: true
+- name: frame_extractor.py
+  visible: true
+- name: video.mov
+  visible: false
