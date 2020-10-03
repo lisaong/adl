@@ -1,7 +1,9 @@
 type: theory
 custom_name: Frame Generator
 files:
+- name: dataset.py
+  visible: true
 - name: X.npy
-  visible: true
+  visible: false
 - name: y.npy
-  visible: true
+  visible: false
