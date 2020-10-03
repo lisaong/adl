@@ -2,7 +2,6 @@ from flask import render_template, request, json
 from demo import app
 from demo import ml
 import os
-import random
 
 
 model_dir = os.path.join(os.getcwd(), 'demo', 'model')
@@ -18,11 +17,7 @@ def default():
 def reply_chat():
     text = request.form['reply']
 
-    # use a random word from the reply text
-    tokens = text.split()
-    seed_word = random.sample(tokens, k=1)
-
     # call the TFModel class to predict
-    predictions = model.predict(seed_word)
+    predictions = model.predict(text)
     print(predictions)
     return json.dumps({'predictions': predictions})
