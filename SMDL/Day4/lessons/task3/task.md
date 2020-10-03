@@ -9,7 +9,7 @@ a batched dataset for training. Training set is batched up and repeated for batc
 
  - Load the MobileNetV2 weights without the top classifier layers (`include_top=False`). Set it to non-trainable.
  
- - Apply a GlobalAveragePooling to flatten the output.
+ - Apply a GlobalAveragePooling to flatten the output and average across the batch.
  
  - Wrap both layers into a [Time Distributed Layer](https://www.tensorflow.org/api_docs/python/tf/keras/layers/TimeDistributed). This will allow these layers to be called on every sequence step (=every frame), rather than just on the first frame.
  
