@@ -1,7 +1,11 @@
 #container {
     border:1px solid #cccccc;
     width:400px;
-    overflow:auto;
+}
+
+#video_container {
+    height:200px;
+    width:200px;
 }
 
 #submit{
