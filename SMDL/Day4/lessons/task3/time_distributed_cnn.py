@@ -29,8 +29,8 @@ def create_model(h, w, c):
     x = TimeDistributed(cnn_model)(model_input)
 
     # pass the output to our small RNN
-    x = GRU(8, activation='tanh')(x)
-    x = Dense(8, activation='relu')(x)
+    x = GRU(4, activation='tanh')(x)
+    x = Dense(4, activation='relu')(x)
     x = Dense(1, activation='sigmoid')(x)  # binary classifier
 
     rnn_model = Model(model_input, x)
