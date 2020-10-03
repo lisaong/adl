@@ -1,20 +1,29 @@
 import tensorflow as tf
 import os
 import sys
+import glob
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 sys.path.append('..')
+
 from task1.frame_extractor import extract_frames, plot_images
 
+BATCH_SIZE = 16
+BATCHES_PER_EPOCH = 5
 
-def parse_video(filename):
-    # get the label from the parent folder name
-    # filename is a Tensor, so we need to use tf.strings.split
-    parts = tf.strings.split(filename, os.sep)
-    label_ = parts[-3]  # parent folder
-    frames, _ = extract_frames(filename, 20,
-                               start_offset=10, step=3,
-                               image_size=(128, 128))
-    return frames, label_
+SEQUENCE_LEN = 20
+START_OFFSET = 10  # frames
+STEP = 3  # frames
+IMAGE_SIZE = (128, 128)  # width, height
+
+
+def parse_video_frames(filename):
+    label_ = os.path.basename(os.path.split(filename)[0])  # parent folder
+    frames_, _ = extract_frames(filename, SEQUENCE_LEN,
+                                start_offset=START_OFFSET, step=STEP,
+                                image_size=IMAGE_SIZE)
+    return frames_, label_
 
 
 if __name__ == "__main__":
@@ -39,11 +48,40 @@ if __name__ == "__main__":
         dataset_dir = os.path.dirname(dataset_path)
 
     # get all the video files
-    print(dataset_dir)
-    list_ds = tf.data.Dataset.list_files(f'{dataset_dir}/*/*.avi')
+    filenames = glob.glob(f'{dataset_dir}/*/*')
+    print(filenames)
 
-    # extract the frames from the video files
-    frames_ds = list_ds.map(parse_video)
+    frames_data = []
+    labels = []
+    for f in filenames:
+        frames, label = parse_video_frames(f)
 
-    for images, label in frames_ds.take(2):
-        plot_images(images, title=label)
+        # only take videos that have sufficient frames extracted
+        if len(frames) == SEQUENCE_LEN:
+            frames_data.append(frames)
+            labels.append(label)
+
+    X = np.stack(frames_data, axis=0)
+    y = np.vstack(labels)
+    print(X.shape, y.shape)
+
+    # split into train and validation
+    X_train, X_val, y_train, y_val = train_test_split(X, y, stratify=y)
+
+    # create 2 datasets
+    train_ds = tf.data.Dataset.from_tensor_slices((X_train, y_train)).\
+        batch(BATCH_SIZE).repeat(BATCHES_PER_EPOCH)
+
+    val_ds = tf.data.Dataset.from_tensor_slices((X_val, y_val))
+
+    # inspect some data
+    print('========================================')
+    print('sample training data')
+    data, label = train_ds.take(1)
+    plot_images(data.numpy(), title=label, output_filename=f'training_{label}.png')
+
+
+    print('========================================')
+    print('sample validation data')
+    data, label = val_ds.take(1)
+    plot_images(data.numpy(), title=label, output_filename=f'val_{label}.png')

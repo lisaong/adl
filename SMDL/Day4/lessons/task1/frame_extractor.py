@@ -42,9 +42,10 @@ def extract_frames(video_path, sequence_len, start_offset=0, step=1,
     return np.vstack(imgs), ids
 
 
-def plot_images(imgs, ids=None, title=''):
-    # plot first 10 frames
-    fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(10, 8))
+def plot_images(imgs, ids=None, title='', rows=2, cols=5,
+                output_filename='frames.png'):
+    # plot first nrows*ncols frames
+    fig, axes = plt.subplots(nrows=rows, ncols=cols, figsize=(10, 8))
     axes = axes.flatten()
     for i in range(min(len(imgs), len(axes))):  # only loop up to the number of plots or images
         # mobilenet_v2.preprocess_input will do zero-mean centering,
@@ -56,7 +57,7 @@ def plot_images(imgs, ids=None, title=''):
             axes[i].set_title(f'{i}')
 
     fig.suptitle(title)
-    plt.savefig('frames.png')
+    plt.savefig(output_filename)
     plt.show()
 
 

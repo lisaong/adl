@@ -4,8 +4,12 @@ This demo shows how to download, extract, and create a video frame dataset from 
 
 1. Use [tf.keras.utils.get_file](https://www.tensorflow.org/api_docs/python/tf/keras/utils/get_file) to download the dataset from URLs. This will download the dataset, unzip it, and cache under the `~/.keras/datasets` folder.
 
-2. Use [tf.data.Dataset.list_files](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#list_files) to glob and find videos in the dataset folder.
+2. Use [glob](https://docs.python.org/3/library/glob.html) to glob and find videos in the dataset folder.
 
-3. Use [tf.data.Dataset.map](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#map) to extract frames from each video into a numpy array, with a label.
+3. Extract frames from each video into a numpy array, with a label, using the function developed in task 1 (`frame_extractor.py).
 
-[Reference](https://www.tensorflow.org/guide/data#decoding_image_data_and_resizing_it)
+4. Stack the dataset and labels. The shape of X should be (batch, sequence, height, width, channels). The shape of y should be (batch, 1).
+
+5. After train-test-split, use [tf.data.Dataset.from_tensor_slices](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_tensor_slices) to create batched datasets for training and validation.
+  - Training set is batched up and repeated for batches per epoch
+  - Validation set is kept as is. Alternatively, validation set can also be kept as numpy arrays. 
