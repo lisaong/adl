@@ -18,4 +18,4 @@
 
 ![form](form.png)
 
-![example](example.png)
+![result](result.png)
