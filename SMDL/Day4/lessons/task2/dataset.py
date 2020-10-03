@@ -6,7 +6,7 @@ import numpy as np
 
 sys.path.append('..')
 
-from task1.frame_extractor import extract_frames, plot_images
+from task1.frame_extractor import extract_frames
 
 SEQUENCE_LEN = 20
 START_OFFSET = 10  # frames
