@@ -14,4 +14,6 @@ a batched dataset for training. Training set is batched up and repeated for batc
  - Wrap both layers into a [Time Distributed Layer](https://www.tensorflow.org/api_docs/python/tf/keras/layers/TimeDistributed). This will allow these layers to be called on every sequence step (=every frame), rather than just on the first frame.
  
  - Pass the output of the Time Distributed CNN layers to an RNN classifier to predict the activity being performed in the video.
-  
+ 
+Architecture:
+![time distributed](time_distributed_cnn.jpg)
