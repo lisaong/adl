@@ -1,0 +1,19 @@
+#container {
+    border:1px solid #cccccc;
+    width:400px;
+}
+
+#video_container {
+    height:200px;
+    width:200px;
+}
+
+#submit{
+    float: right;
+    padding: 2px;
+    margin: 2px;
+}
+
+body {
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+}

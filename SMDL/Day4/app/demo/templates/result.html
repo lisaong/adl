@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<link rel="stylesheet" href="static/styles.css" type="text/css" />
+</head>
+
+<body>
+    <div id="video_container">
+        <h2>Predicted: {{ prediction }}</h2>
+
+        <img id="bg" src="{{ url_for('video_feed') }}">
+	</div>
+</body>
+</html>

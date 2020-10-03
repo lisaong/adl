@@ -1,4 +1,4 @@
-from flask import redirect, render_template, request, json
+from flask import render_template, request, json
 from demo import app
 from demo import ml
 import os

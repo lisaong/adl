@@ -4,6 +4,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 
+# support loading from local and flask app
 import imp
 import sys
 
