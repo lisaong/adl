@@ -1,4 +1,4 @@
-from flask import render_template, request, json
+from flask import render_template, request, url_for
 from demo import app
 from demo import ml
 import os
@@ -26,6 +26,10 @@ def predict():
     prediction, probability = model.predict(complete_filename)
     print(prediction, probability)
 
+    base_url = url_for('default', _external=True)
+    filename_url = f'{base_url}/uploads/{filename}'
+    print(filename_url)
+
     return render_template('result.html',
                            prediction=f'{prediction} {probability:.3f}',
-                           url=f'uploads/{filename}')
+                           url=filename_url)
