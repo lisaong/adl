@@ -1,5 +1,6 @@
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
+
 import numpy as np
 
 BATCH_SIZE = 16
