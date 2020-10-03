@@ -48,7 +48,7 @@ class VideoRenderer(object):
         ret, frame = self.video.read()
         if ret:
             # encode raw frame to JPEG and display it
-            frame = cv2.resize(frame, (160, 160), interpolation=cv2.INTER_LINEAR)
+            frame = cv2.resize(frame, (480, 480), interpolation=cv2.INTER_LINEAR)
             ret, jpeg = cv2.imencode('.jpg', frame)
             return jpeg.tobytes()
         else:
