@@ -42,7 +42,7 @@ def extract_frames(video_path, sequence_len, start_offset=0, step=1,
     return np.vstack(imgs), ids
 
 
-def plot_images(imgs, ids, title=''):
+def plot_images(imgs, ids=None, title=''):
     # plot first 10 frames
     fig, axes = plt.subplots(nrows=2, ncols=5, figsize=(10, 8))
     axes = axes.flatten()
@@ -50,7 +50,10 @@ def plot_images(imgs, ids, title=''):
         # mobilenet_v2.preprocess_input will do zero-mean centering,
         # but matplotlib only understands [0..1] for floats
         axes[i].imshow((imgs[i] * .5) + .5)
-        axes[i].set_title(f'frame {ids[i]}')
+        if ids:
+            axes[i].set_title(f'frame {ids[i]}')
+        else:
+            axes[i].set_title(f'{i}')
 
     fig.suptitle(title)
     plt.savefig('frames.png')

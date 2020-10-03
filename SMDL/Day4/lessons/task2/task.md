@@ -1,36 +1,11 @@
-This is a task description file.
-Its content will be displayed to a learner
-in the **Task Description** window.
+## Video Frame Dataset
 
-It supports both Markdown and HTML.
-To toggle the format, you can rename **task.md**
-to **task.html**, or vice versa.
-The default task description format can be changed
-in **Preferences | Tools | Education**,
-but this will not affect any existing task description files.
+This demo shows how to download, extract, and create a video frame dataset from zip files.
 
-The following features are available in
-**task.md/task.html** which are specific to the EduTools plugin:
+1. Use [tf.keras.utils.get_file](https://www.tensorflow.org/api_docs/python/tf/keras/utils/get_file) to download the dataset from URLs. This will download the dataset, unzip it, and cache under the `~/.keras/datasets` folder.
 
-- Hints can be added anywhere in the task text.
-Type "hint" and press Tab.
-Hints should be added to an empty line in the task text.
-In hints you can use HTML only.
-<div class="hint">Text of your hint</div>
+2. Use [tf.data.Dataset.list_files](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#list_files) to glob and find videos in the dataset folder.
 
-- You can insert shortcuts in the task description.
-While **task.html/task.md** is open, right-click anywhere
-on the **Editor** tab and choose the **Insert shortcut** option
-from the context menu.
-For example: &shortcut:FileStructurePopup;.
+3. Use [tf.data.Dataset.map](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#map) to extract frames from each video into a numpy array, with a label.
 
-- Insert the &percnt;`IDE_NAME`&percnt; macro,
-which will be replaced by the actual IDE name.
-For example, **%IDE_NAME%**.
-
-- Insert PSI elements, by using links like
-`<a href="psi_element://link.to.element">element description</a>`.
-To get such a link, right-click the class or method
-and select **Copy Reference**.
-Then press &shortcut:EditorPaste; to insert the link where appropriate.
-For example, a <a href="psi_element://java.lang.String#contains">link to the "contains" method</a>.
+[Reference](https://www.tensorflow.org/guide/data#decoding_image_data_and_resizing_it)
