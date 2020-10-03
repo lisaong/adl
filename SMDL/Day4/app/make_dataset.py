@@ -47,7 +47,7 @@ def parse_video_frames(filename, sequence_len, start_offset, step, image_size):
     return frames_, label_
 
 
-def download_dataset(dataset_info, sequence_len):
+def download_dataset(dataset_info, sequence_len, start_offset, step, image_size):
 
     dataset_dir = ''
     for info in dataset_info.values():
@@ -64,7 +64,9 @@ def download_dataset(dataset_info, sequence_len):
     frames_data = []
     labels = []
     for f in filenames:
-        frames, label = parse_video_frames(f)
+        frames, label = parse_video_frames(f, sequence_len,
+                                           start_offset, step,
+                                           image_size)
 
         # only take videos that have sufficient frames extracted
         if len(frames) == sequence_len:

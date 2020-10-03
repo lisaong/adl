@@ -32,9 +32,10 @@ def save_artifacts(key_values: dict, dest='model_artifacts.pkl'):
 
 
 if __name__ == "__main__":
-    sequence_len = 20
-    batch_size = 32
-    batches_per_epoch = 10
+    sequence_len = 15
+    start_offset = 10  # frames
+    step = 3  # frames
+    image_size = (128, 128)  # width, height
 
     dataset_info = {
         'Archery': {
@@ -51,23 +52,26 @@ if __name__ == "__main__":
         }
     }
 
-    X, y = download_dataset(dataset_info, sequence_len)
+    X, y = download_dataset(dataset_info, sequence_len,
+                            start_offset, step, image_size)
 
     # label encode targets
     le = LabelEncoder()
-    y_cat = to_categorical(le.fit_transform(y))
+    y_cat = to_categorical(le.fit_transform(y.ravel()))
     num_classes = len(le.classes_)
 
     # split to train and test
     X_train, X_val, y_train, y_val = train_test_split(X, y_cat, stratify=y)
 
     # create batched training dataset
+    batch_size = 32
+    batches_per_epoch = 10
     train_ds = tf.data.Dataset.from_tensor_slices((X_train, y_train)). \
         batch(batch_size).repeat(batches_per_epoch)
 
     # create model
     height, width, channels = X.shape[2], X.shape[3], X.shape[4]
-    model = create_model(height, width, channels, 16, num_classes)
+    model = create_model(height, width, channels, 8, num_classes)
 
     # train model
     model_path = os.path.join(MODEL_DIR, 'td_cnn_rnn.h5')
@@ -86,9 +90,11 @@ if __name__ == "__main__":
     plt.savefig('learning_curve.png')
     plt.show()
 
-    # save artifacts
     save_artifacts({'label_encoder': le,
-                    'sequence_len': sequence_len})
+                    'sequence_len': sequence_len,
+                    'start_offset': start_offset,
+                    'step': step,
+                    'image_size': image_size})
 
     # metrics
     best_model = load_model(model_path)
