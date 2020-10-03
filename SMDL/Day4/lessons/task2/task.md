@@ -10,6 +10,4 @@ This demo shows how to download, extract, and create a video frame dataset from 
 
 4. Stack the dataset and labels. The shape of X should be (batch, sequence, height, width, channels). The shape of y should be (batch, 1).
 
-5. After train-test-split, use [tf.data.Dataset.from_tensor_slices](https://www.tensorflow.org/api_docs/python/tf/data/Dataset#from_tensor_slices) to create batched datasets for training and validation.
-  - Training set is batched up and repeated for batches per epoch
-  - Validation set is kept as is. Alternatively, validation set can also be kept as numpy arrays. 
+5. Save the datasets for the next task.

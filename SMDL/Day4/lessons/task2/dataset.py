@@ -3,14 +3,10 @@ import os
 import sys
 import glob
 import numpy as np
-from sklearn.model_selection import train_test_split
 
 sys.path.append('..')
 
 from task1.frame_extractor import extract_frames, plot_images
-
-BATCH_SIZE = 16
-BATCHES_PER_EPOCH = 5
 
 SEQUENCE_LEN = 20
 START_OFFSET = 10  # frames
@@ -64,30 +60,6 @@ if __name__ == "__main__":
     X = np.stack(frames_data, axis=0)
     y = np.vstack(labels)
     print(X.shape, y.shape)
-
-    # split into train and validation
-    X_train, X_val, y_train, y_val = train_test_split(X, y, stratify=y)
-
-    # create 2 datasets
-    train_ds = tf.data.Dataset.from_tensor_slices((X_train, y_train)).\
-        batch(BATCH_SIZE).repeat(BATCHES_PER_EPOCH)
-
-    val_ds = tf.data.Dataset.from_tensor_slices((X_val, y_val))
-
-    # inspect some data
-    print('========================================')
-    print('1 batch of training data')
-    train_samples = list(train_ds.take(1).as_numpy_iterator())
-    train_batch = train_samples[0]
-    print('train data shape:', train_batch[0].shape)  # data of the first batch
-    print('train labels shape:', train_batch[1].shape)  # labels of the first batch
-
-    print('========================================')
-    print('1 row of sample validation data')
-    val_samples = list(val_ds.take(1).as_numpy_iterator())
-    val_sample = val_samples[0]
-    print('val data shape:', val_sample[0].shape)  # data of the first row
-    print('val labels shape:', val_sample[1].shape)  # labels of the first row
 
     print('========================================')
     print('Saving dataset')
