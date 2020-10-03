@@ -3,3 +3,5 @@ custom_name: Time Distributed CNN to RNN
 files:
 - name: time_distributed_cnn.py
   visible: true
+- name: td_cnn_rnn.h5
+  visible: true

@@ -1,15 +1,18 @@
+# Demo of time-distributed CNN for binary classification
+
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.applications import MobileNetV2
-from tensorflow.keras.models import Model
+from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, GlobalAveragePooling2D, \
     TimeDistributed, GRU, Dense
 from tensorflow.keras.callbacks import ModelCheckpoint
-from sklearn.preprocessing import LabelEncoder
 
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import classification_report
 import numpy as np
 
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 BATCHES_PER_EPOCH = 5
 
 
@@ -24,13 +27,15 @@ def create_model(h, w, c):
     # input shape == (sequence, height, width, channels)
     model_input = Input(shape=(None, height, width, channels))
     x = TimeDistributed(cnn_model)(model_input)
-    x = GRU(128, activation='relu')(x)
-    x = Dense(256, activation='relu')(x)
+
+    # pass the output to our small RNN
+    x = GRU(8, activation='tanh')(x)
+    x = Dense(8, activation='relu')(x)
     x = Dense(1, activation='sigmoid')(x)  # binary classifier
 
-    model = Model(model_input, x)
-    model.summary()
-    return model
+    rnn_model = Model(model_input, x)
+    rnn_model.summary()
+    return rnn_model
 
 
 if __name__ == "__main__":
@@ -57,6 +62,11 @@ if __name__ == "__main__":
 
     mc = ModelCheckpoint('td_cnn_rnn.h5', save_best_only=True, monitor='val_loss')
 
-    history = model.fit(train_ds, epochs=5,
-                        validation_data=(X_val, y_val),
-                        callbacks=[mc])
+    model.fit(train_ds, epochs=3,
+              validation_data=(X_val, y_val),
+              callbacks=[mc])
+
+    # metrics
+    best_model = load_model('td_cnn_rnn.h5')
+    preds = best_model.predict(X_val) >= 0.5
+    print(classification_report(y_val, preds))
