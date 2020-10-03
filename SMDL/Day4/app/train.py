@@ -12,6 +12,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 
 import pickle
 import os
+from shutil import copyfile
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -63,38 +64,31 @@ if __name__ == "__main__":
     # split to train and test
     X_train, X_val, y_train, y_val = train_test_split(X, y_cat, stratify=y)
 
-    # create batched training dataset
+    # TODO: create a batched tf.data.Dataset for training
     batch_size = 32
-    batches_per_epoch = 10
-    train_ds = tf.data.Dataset.from_tensor_slices((X_train, y_train)). \
-        batch(batch_size).repeat(batches_per_epoch)
+    batches_per_epoch = 5
+    _ANS_
 
-    # create model
+    # TODO: create model, using the create_model helper function (see td_cnn_rnn.py)
     height, width, channels = X.shape[2], X.shape[3], X.shape[4]
-    model = create_model(height, width, channels, 8, num_classes)
+    _ANS_
 
-    # train model
+    # TODO: train model and plot learning curve
     model_path = os.path.join(MODEL_DIR, 'td_cnn_rnn.h5')
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
     mc = ModelCheckpoint(model_path, save_best_only=True, monitor='val_loss')
-    history = model.fit(train_ds, epochs=5,
-                        validation_data=(X_val, y_val),
-                        callbacks=[mc])
 
-    plt.plot(history.history['loss'], label='train')
-    plt.plot(history.history['val_loss'], label='validation')
-    plt.title('Learning Curve')
-    plt.xlabel('epochs')
-    plt.ylabel('loss')
-    plt.legend()
-    plt.savefig('learning_curve.png')
-    plt.show()
+    _ANS_
 
+
+    # save artifacts
     save_artifacts({'label_encoder': le,
                     'sequence_len': sequence_len,
                     'start_offset': start_offset,
                     'step': step,
                     'image_size': image_size})
+
+    # copy dataset pre-processing code
+    copyfile('make_dataset.py', os.path.join(model_path, 'make_dataset.py'))
 
     # metrics
     best_model = load_model(model_path)

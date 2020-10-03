@@ -16,6 +16,7 @@ Day3/lessons/task4/model_artifacts.pkl
 Day3/train/learning_curve.png
 Day4/app/demo/model/model_artifacts.pkl
 Day4/app/demo/model/td_cnn_rnn.h5
+Day4/app/train_solution.py
 Day4/lessons/task2/X.npy
 Day4/lessons/task2/y.npy
 Day4/lessons/task3/td_cnn_rnn.h5
