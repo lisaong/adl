@@ -7,7 +7,6 @@ import pickle
 import imp
 import sys
 
-sys.path.append('model')
 try:
     imp.find_module('make_dataset')
     found = True
@@ -17,7 +16,7 @@ except ImportError:
 if found:  # testing only
     from make_dataset import parse_video_frames
 else: # run from flask app
-    from demo.model.make_dataset import parse_video_frames
+    from demo.make_dataset import parse_video_frames
 
 
 class TFModel:
@@ -38,13 +37,16 @@ class TFModel:
         if len(frames) >= self.artifacts['sequence_len']:
             input_sequence = np.expand_dims(frames[:self.artifacts['sequence_len']],
                                             axis=0)  # add a batch axis
-            predicted_id = self.model.predict(input_sequence).argmax(axis=1)
-            prediction = self.label_encoder.inverse_transform(predicted_id)
+            probabilities = self.model.predict(input_sequence)
+            predicted_id = probabilities.argmax(axis=1)
+
+            prediction = self.label_encoder.inverse_transform(predicted_id)[0]
+            probability = probabilities[0][predicted_id[0]]
+            return prediction, probability
         else:
             print('Video is too short')
             prediction = 'Video is too short'
-
-        return prediction
+            return prediction, None
 
 
 # tests

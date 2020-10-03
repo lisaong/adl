@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<link rel="stylesheet" href="static/styles.css" type="text/css" />
+</head>
+
+<body>
+	<h2>Classify the activity</h2>
+
+	<p>Upload a short video (8MB limit) </p>
+	<div id="container">
+	  <form action="predict" method="post" enctype="multipart/form-data">
+		 <input type="file" name="file" accept=".mov,.avi" />
+		 <input type="submit" id="submit" />
+	  </form>
+	</div>
+</body>
+</html>

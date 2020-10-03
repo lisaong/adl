@@ -1,0 +1,13 @@
+#container {
+    border:1px solid #cccccc;
+}
+
+#submit{
+    float: right;
+    padding: 2px;
+    margin: 2px;
+}
+
+body {
+    font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+}
