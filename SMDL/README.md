@@ -5,4 +5,7 @@ For this course we will be using PyCharm as the Integrated Development Environme
 
 2. Download and install PyCharm Community Edition: https://www.jetbrains.com/pycharm/download
 
-3. Install the EduTools plugin for PyCharm: https://www.jetbrains.com/help/education/install-edutools-plugin.html?section=PyCharm#72cb
+3. Follow the steps in the Setup Video: https://youtu.be/d9aotUJenWY
+
+Reference:
+- EduTools plugin for PyCharm: https://www.jetbrains.com/help/education/install-edutools-plugin.html?section=PyCharm#72cb
