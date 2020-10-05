@@ -7,7 +7,7 @@ For this course we will be using PyCharm as the Integrated Development Environme
 
 3. Follow the steps in the setup video: https://youtu.be/d9aotUJenWY
  * Installing the EduTools plugin
- * Importing the Course lessons and code
+ * Importing the Course lessons and code from [Releases](https://github.com/lisaong/adl/releases).
 
 Reference:
 - EduTools plugin for PyCharm: https://www.jetbrains.com/help/education/install-edutools-plugin.html?section=PyCharm#72cb
