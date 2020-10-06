@@ -93,10 +93,10 @@ def predict(sentence: str):
         # get the predicted id for the next word
         predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
         predicted_id = tf.argmax(predictions[-1]).numpy()
-        result += target_vectorizer.get_vocabulary()[predicted_id] + ' '
+        result += target_vocab[predicted_id] + ' '
 
         # stop when we reach the end token
-        if target_vectorizer.get_vocabulary()[predicted_id] == END_TOKEN:
+        if target_vocab[predicted_id] == END_TOKEN:
             break
 
         # the predicted id and decoder hidden state is fed back into the model
