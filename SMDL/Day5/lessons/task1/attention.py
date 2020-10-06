@@ -8,30 +8,29 @@ from tensorflow.keras.layers import Layer, Embedding, GRU, Dense
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
+import pandas as pd
 import time
 
-# source text
-english_text = ['Ask, and it will be given to you',
-                'seek, and you will find',
-                'knock, and it will be opened to you.',
-                'For everyone who asks receives',
-                'and he who seeks finds',
-                'and to him who knocks it will be opened']
 
-# target text
-spanish_text = ['Pidan, y se les dará',
-                'busquen, y encontrarán',
-                'llamen, y se les abrirá.',
-                'Porque todo el que pide, recibe',
-                'el que busca, encuentra',
-                'y al que llama, se le abre']
-
-BATCH_SIZE = len(english_text)
+BATCH_SIZE = 16
 EMBEDDING_SIZE = 4
 BOTTLENECK_UNITS = 6
 
 START_TOKEN = 'aaaaa'
 END_TOKEN = 'zzzzz'
+
+
+def get_data(data_path):
+    df_source = pd.read_csv(f'{data_path}/kjv.txt', sep='  ', index_col=0, header=None, engine='python')
+    df_target = pd.read_csv(f'{data_path}/luther.txt', sep='  ', index_col=0, header=None, engine='python')
+    df_data = pd.concat([df_source, df_target], axis=1)
+    df_data.columns = ['source', 'target']
+    return df_data
+
+
+def get_delimited_texts(s: pd.Series):
+    return s.apply(lambda x: f'{START_TOKEN} {x} {END_TOKEN}').values
+
 
 
 # Attention layer
@@ -151,18 +150,22 @@ def get_vectorizer(texts):
     return vectorizer
 
 
-src_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]
+# Vectorize
+df = get_data('../../../Day3/data')
+src_delimited = get_delimited_texts(df['source'])
+tgt_delimited = get_delimited_texts(df['target'])
+
 src_vectorizer = get_vectorizer(src_delimited)
 src_vocab = src_vectorizer.get_vocabulary()
 print('Source Vocabulary', src_vocab)
 src_sequences = src_vectorizer(src_delimited)
 
-tgt_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
 tgt_vectorizer = get_vectorizer(tgt_delimited)
 tgt_vocab = tgt_vectorizer.get_vocabulary()
 print('Target Vocabulary', tgt_vocab)
 tgt_sequences = tgt_vectorizer(tgt_delimited)
 tgt_start_token_index = tgt_vocab.index(START_TOKEN)
+
 
 # Model
 encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
