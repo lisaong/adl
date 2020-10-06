@@ -1,0 +1,7 @@
+type: theory
+custom_name: Attention
+files:
+- name: attention.py
+  visible: true
+- name: task.md
+  visible: true

@@ -4,10 +4,10 @@ summary: |-
   Sequence Modeling with Deep Learning course.
   Created: Sep 25, 2020, 9:12:52 PM.
 programming_language: Python
-programming_language_version: 3.8
 environment: unittest
 content:
 - Day1
 - Day2
 - Day3
 - Day4
+- Day5
