@@ -4,15 +4,30 @@
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Layer, Embedding, GRU, Dense
+from tensorflow.keras.layers import Embedding, GRU, Dense, Attention
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
-import pandas as pd
-import time
 
 
-BATCH_SIZE = 16
+# source text
+english_text = ['Ask, and it will be given to you',
+                'seek, and you will find',
+                'knock, and it will be opened to you.',
+                'For everyone who asks receives',
+                'and he who seeks finds',
+                'and to him who knocks it will be opened']
+
+# target text
+spanish_text = ['Pidan, y se les dará',
+                'busquen, y encontrarán',
+                'llamen, y se les abrirá.',
+                'Porque todo el que pide, recibe',
+                'el que busca, encuentra',
+                'y al que llama, se le abre']
+
+
+BATCH_SIZE = len(english_text)
 EMBEDDING_SIZE = 4
 BOTTLENECK_UNITS = 6
 
@@ -20,49 +35,24 @@ START_TOKEN = 'aaaaa'
 END_TOKEN = 'zzzzz'
 
 
-def get_data(data_path):
-    df_source = pd.read_csv(f'{data_path}/kjv.txt', sep='  ', index_col=0, header=None, engine='python')
-    df_target = pd.read_csv(f'{data_path}/luther.txt', sep='  ', index_col=0, header=None, engine='python')
-    df_data = pd.concat([df_source, df_target], axis=1)
-    df_data.columns = ['source', 'target']
-    return df_data
+def get_vectorizer(texts):
+    vectorizer = TextVectorization()
+    vectorizer.adapt(texts)
+    return vectorizer
 
 
-def get_delimited_texts(s: pd.Series):
-    return s.apply(lambda x: f'{START_TOKEN} {x} {END_TOKEN}').values
+src_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in english_text]
+src_vectorizer = get_vectorizer(src_delimited)
+src_vocab = src_vectorizer.get_vocabulary()
+print('Source Vocabulary', src_vocab)
+src_sequences = src_vectorizer(src_delimited)
 
-
-
-# Attention layer
-# https://www.tensorflow.org/tutorials/text/nmt_with_attention
-class BahdanauAttention(Layer):
-    def __init__(self, units):
-        super(BahdanauAttention, self).__init__()
-        self.W1 = Dense(units)
-        self.W2 = Dense(units)
-        self.V = Dense(1)
-
-    def call(self, query, values):
-        # query hidden state shape == (batch_size, hidden size)
-        # query_with_time_axis shape == (batch_size, 1, hidden size)
-        # values shape == (batch_size, max_len, hidden size)
-        # we are doing this to broadcast addition along the time axis to calculate the score
-        query_with_time_axis = tf.expand_dims(query, 1)
-
-        # score shape == (batch_size, max_length, 1)
-        # we get 1 at the last axis because we are applying score to self.V
-        # the shape of the tensor before applying self.V is (batch_size, max_length, units)
-        score = self.V(tf.nn.tanh(
-            self.W1(query_with_time_axis) + self.W2(values)))
-
-        # attention_weights shape == (batch_size, max_length, 1)
-        attention_weights = tf.nn.softmax(score, axis=1)
-
-        # context_vector shape after sum == (batch_size, hidden_size)
-        context_vector = attention_weights * values
-        context_vector = tf.reduce_sum(context_vector, axis=1)
-
-        return context_vector, attention_weights
+tgt_delimited = [f'{START_TOKEN} {t} {END_TOKEN}' for t in spanish_text]
+tgt_vectorizer = get_vectorizer(tgt_delimited)
+tgt_vocab = tgt_vectorizer.get_vocabulary()
+print('Target Vocabulary', tgt_vocab)
+tgt_sequences = tgt_vectorizer(tgt_delimited)
+tgt_start_token_index = tgt_vocab.index(START_TOKEN)
 
 
 # Encoder from Day3
@@ -100,12 +90,12 @@ class MyDecoderWithAttention(Model):
         self.fc = Dense(vocab_size)
 
         # NEW: attention
-        self.attention = BahdanauAttention(self.dec_units)
+        self.attention = Attention()
 
     def call(self, x, hidden, enc_output):
         # NEW: get the context vector (i.e. weighted encoded input) by applying attention
         # query: previous decoder hidden state, value: encoded input sequence
-        weighted_encoded_input, attention_weights = self.attention(hidden, enc_output)
+        weighted_encoded_input = self.attention([hidden, enc_output])
 
         # pass the target through the decoder
         # x shape after passing through embedding == (batch_size, 1, embedding_dim)
@@ -124,12 +114,24 @@ class MyDecoderWithAttention(Model):
         # output shape == (batch_size, vocab)
         x = self.fc(output)
 
-        return x, state, attention_weights
+        return x, state
 
     def get_config(self):
         # to enable model saving as HDF5 format
         return {'batch_size': self.batch_size,
                 'dec_units': self.dec_units}
+
+
+
+# Model
+encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
+                    enc_units=BOTTLENECK_UNITS,
+                    batch_size=BATCH_SIZE)
+
+
+decoder = MyDecoderWithAttention(len(tgt_vocab), embedding_dim=EMBEDDING_SIZE,
+                                 dec_units=BOTTLENECK_UNITS,
+                                 batch_size=BATCH_SIZE)
 
 
 # Loss Function
@@ -143,38 +145,6 @@ def loss_function(truth, pred):
     loss_value *= mask
     return tf.reduce_mean(loss_value)
 
-
-def get_vectorizer(texts):
-    vectorizer = TextVectorization()
-    vectorizer.adapt(texts)
-    return vectorizer
-
-
-# Vectorize
-df = get_data('../../../Day3/data')
-src_delimited = get_delimited_texts(df['source'])
-tgt_delimited = get_delimited_texts(df['target'])
-
-src_vectorizer = get_vectorizer(src_delimited)
-src_vocab = src_vectorizer.get_vocabulary()
-print('Source Vocabulary', src_vocab)
-src_sequences = src_vectorizer(src_delimited)
-
-tgt_vectorizer = get_vectorizer(tgt_delimited)
-tgt_vocab = tgt_vectorizer.get_vocabulary()
-print('Target Vocabulary', tgt_vocab)
-tgt_sequences = tgt_vectorizer(tgt_delimited)
-tgt_start_token_index = tgt_vocab.index(START_TOKEN)
-
-
-# Model
-encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
-                    enc_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
-
-decoder = MyDecoderWithAttention(len(tgt_vocab), embedding_dim=EMBEDDING_SIZE,
-                                 dec_units=BOTTLENECK_UNITS,
-                                 batch_size=BATCH_SIZE)
 
 
 # Train
@@ -194,7 +164,7 @@ def train_step(source, target, enc_hidden, optimizer):
         for t in range(1, target.shape[1]):
             # Loop through the target sequence,
             # passing enc_output to the decoder
-            predictions, dec_hidden, _ = decoder(dec_input, dec_hidden, enc_output)
+            predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_output)
             loss += loss_function(target[:, t], predictions)
 
             # Using teacher forcing by setting the decoder input to the next target
@@ -219,7 +189,6 @@ def train(train_ds, epochs, optimizer):
     # training loop
     hist = []
     for epoch in range(epochs):
-        start_time = time.time()
 
         enc_hidden = encoder.initialize_hidden_state()
         total_loss = 0
@@ -254,7 +223,7 @@ def predict(sentence: str):
     max_target_sequence_length = 10
     for t in range(max_target_sequence_length):
         # get the predicted id for the next word
-        predictions, dec_hidden, attention_weights = decoder(dec_input, dec_hidden, enc_out)
+        predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
         predicted_id = tf.argmax(predictions[-1]).numpy()
         result += tgt_vocab[predicted_id] + ' '
 
@@ -272,10 +241,10 @@ if __name__ == '__main__':
     BATCHES_PER_EPOCH = 5
     dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
     dataset = dataset.shuffle(1024) \
-        .batch(BATCH_SIZE) \
+        .batch(BATCH_SIZE, drop_remainder=True) \
         .repeat(BATCHES_PER_EPOCH)
 
-    history = train(dataset, epochs=5000, optimizer=Adam())
+    history = train(dataset, epochs=100, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
