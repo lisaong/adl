@@ -5,10 +5,17 @@ import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Embedding, GRU, Dense, Attention
-from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
+import time
 import matplotlib.pyplot as plt
 
+# import classes and losses from previous tasks
+import sys
+import os
+
+sys.path.append(os.path.join('..', '..', '..', 'Day3', 'lessons'))
+from task1.encoder import MyEncoder
+from task3.loss_function import loss_function
 
 # source text
 english_text = ['Ask, and it will be given to you',
@@ -26,13 +33,12 @@ spanish_text = ['Pidan, y se les dará',
                 'el que busca, encuentra',
                 'y al que llama, se le abre']
 
-
 BATCH_SIZE = len(english_text)
 EMBEDDING_SIZE = 4
 BOTTLENECK_UNITS = 6
 
-START_TOKEN = 'aaaaa'
-END_TOKEN = 'zzzzz'
+START_TOKEN = 'aaaa'
+END_TOKEN = 'zzzz'
 
 
 def get_vectorizer(texts):
@@ -54,29 +60,9 @@ print('Target Vocabulary', tgt_vocab)
 tgt_sequences = tgt_vectorizer(tgt_delimited)
 tgt_start_token_index = tgt_vocab.index(START_TOKEN)
 
-
-# Encoder from Day3
-class MyEncoder(Model):
-    def __init__(self, vocab_size, embedding_dim, enc_units, batch_size):
-        super(MyEncoder, self).__init__()
-        self.vocab_size = vocab_size
-        self.batch_size = batch_size
-        self.enc_units = enc_units
-        self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.enc_units, return_state=True)
-
-    def call(self, x, hidden):
-        x = self.embedding(x)
-        output, state = self.gru(x, initial_state=hidden)
-        return output, state
-
-    def initialize_hidden_state(self):
-        return tf.zeros((self.batch_size, self.enc_units))
-
-    def get_config(self):
-        # to enable model saving as HDF5 format
-        return {'batch_size': self.batch_size,
-                'enc_units': self.enc_units}
+encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
+                    enc_units=BOTTLENECK_UNITS,
+                    batch_size=BATCH_SIZE)
 
 
 # Decoder from Day3, modified with Attention
@@ -89,20 +75,23 @@ class MyDecoderWithAttention(Model):
         self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
         self.fc = Dense(vocab_size)
 
-        # NEW: attention
+        # NEW: attention, increase dropout to reduce the effect of the weights
         self.attention = Attention()
 
     def call(self, x, hidden, enc_output):
-        # NEW: get the context vector (i.e. weighted encoded input) by applying attention
+        # NEW: get the context vector (i.e. weighted encoded output) by applying attention
         # query: previous decoder hidden state, value: encoded input sequence
-        weighted_encoded_input = self.attention([hidden, enc_output])
+        context_vector = self.attention([hidden, enc_output])
 
         # pass the target through the decoder
         # x shape after passing through embedding == (batch_size, 1, embedding_dim)
         x = self.embedding(x)
 
-        # NEW: concat the context vector with the target
-        x = tf.concat([tf.expand_dims(weighted_encoded_input, 1), x], axis=-1)
+        # NEW: concat the context vector with the encoded output and target
+        # (Optionally, you can exclude the encoded output)
+        x = tf.concat([tf.expand_dims(context_vector, 1),
+                       tf.expand_dims(enc_output, 1),  # optional
+                       x], axis=-1)
 
         # passing the concatenated vector to the GRU
         output, state = self.gru(x)
@@ -122,32 +111,13 @@ class MyDecoderWithAttention(Model):
                 'dec_units': self.dec_units}
 
 
-
-# Model
-encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
-                    enc_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
-
-
 decoder = MyDecoderWithAttention(len(tgt_vocab), embedding_dim=EMBEDDING_SIZE,
                                  dec_units=BOTTLENECK_UNITS,
                                  batch_size=BATCH_SIZE)
 
 
-# Loss Function
-loss_equation = SparseCategoricalCrossentropy(from_logits=True, reduction='none')
-
-
-def loss_function(truth, pred):
-    mask = tf.math.logical_not(tf.math.equal(truth, 0))
-    loss_value = loss_equation(truth, pred)
-    mask = tf.cast(mask, dtype=loss_value.dtype)
-    loss_value *= mask
-    return tf.reduce_mean(loss_value)
-
-
-
-# Train
+# https://www.tensorflow.org/api_docs/python/tf/function
+# Compile the function into a Tensorflow graph
 @tf.function
 def train_step(source, target, enc_hidden, optimizer):
     loss = 0
@@ -185,26 +155,27 @@ def train_step(source, target, enc_hidden, optimizer):
     return batch_loss
 
 
-def train(train_ds, epochs, optimizer):
+def train(train_dataset, epochs, optimizer):
     # training loop
-    hist = []
+
+    loss_history = []
+
     for epoch in range(epochs):
+        start_time = time.time()
 
         enc_hidden = encoder.initialize_hidden_state()
         total_loss = 0
 
-        # loop batches per epoch
-        batch = 0
-        for batch, (src_batch, tgt_batch) in enumerate(train_ds):
+        # https://www.tensorflow.org/guide/keras/writing_a_training_loop_from_scratch
+        for batch, (src_batch, tgt_batch) in enumerate(train_dataset):
             batch_loss = train_step(src_batch, tgt_batch, enc_hidden, optimizer)
-
             total_loss += batch_loss
             print(f'> {epoch + 1} ({batch + 1}) Loss {batch_loss.numpy():.4f}')
 
-        print(f'>> {epoch + 1} Loss {(total_loss / (batch + 1)):.4f}\n')
-        hist.append(total_loss / (batch + 1))
+        print(f'>> {epoch + 1} Loss {(total_loss / (batch + 1)):.4f} Elapsed {time.time() - start_time:.4f} sec')
+        loss_history.append(total_loss / (batch + 1))
 
-    return hist
+    return loss_history
 
 
 def predict(sentence: str):
@@ -238,13 +209,14 @@ def predict(sentence: str):
 
 
 if __name__ == '__main__':
+    # Create a batched dataset from our sequences
     BATCHES_PER_EPOCH = 5
     dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
-    dataset = dataset.shuffle(1024) \
-        .batch(BATCH_SIZE, drop_remainder=True) \
+    dataset = dataset.shuffle(1024)\
+        .batch(BATCH_SIZE)\
         .repeat(BATCHES_PER_EPOCH)
 
-    history = train(dataset, epochs=100, optimizer=Adam())
+    history = train(dataset, epochs=500, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
@@ -253,6 +225,5 @@ if __name__ == '__main__':
     plt.savefig('learning_curve.png')
     plt.show()
 
-    # get predictions
     for t in english_text:
         print(t, '=>', predict(t))
