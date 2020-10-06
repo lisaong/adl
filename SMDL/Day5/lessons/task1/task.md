@@ -20,7 +20,7 @@ The most basic Attention layer receives input in the form of query and key-value
 
 * The "relevance" is computed as a **weighted sum of the key and query sequence**. This yields a set of dynamic scores for each step in the value sequence v[t] (remember, value sequence is the **source** sequence).
 
-* The dynamic scores are then **applied to the value sequence using another weighted sum**. This yields a set of dynamically weighted values, where higher weightage at v[t] means more relevance (more "attention" is given).
+* The dynamic scores are then **applied to the value sequence using another weighted sum**. This yields a set of dynamically weighted values, where higher weightage at v[t] means more relevance (more "attention" is given). This is called the **context vector** and is concatenated with the input to the subsequent layers.
 
 Further Enhancements:
 * Self-attention: where key, value, and query 
