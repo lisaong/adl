@@ -9,5 +9,8 @@ For this course we will be using PyCharm as the Integrated Development Environme
  * Installing the EduTools plugin
  * Importing the Course lessons and code from [Releases](https://github.com/lisaong/adl/releases).
 
-Reference:
+## Intro Videos
+* Debugging in PyCharm: https://youtu.be/y4bUDHMJZFE
+
+## Documentation
 - EduTools plugin for PyCharm: https://www.jetbrains.com/help/education/install-edutools-plugin.html?section=PyCharm#72cb
