@@ -5,7 +5,7 @@ learn which inputs are "most relevant" in the decisions made by an artificial ne
 
 Attention layers were introduced in 2015 (for Neural Machine Translation), but the general principle can apply to sequence-to-sequence models. 
 
-Attention (a variant called multi-headed attention) is also the main element in Transformers. Transformers are tipped to be the successors to RNNs for sequential learning. We will cover Transformers in the next task.
+Attention (a variant called multi-headed attention) is also the main element in Transformers. Transformers are tipped to be the successors to RNNs for sequential learning. We will cover an example of a Transformer in the next task.
 
 The most basic Attention layer receives input in the form of query and key-value pairs:
 
@@ -26,13 +26,14 @@ The most basic Attention layer receives input in the form of query and key-value
 
 Inputs are query tensor of shape [batch_size, Tq, dim], value tensor of shape [batch_size, Tv, dim] and key tensor of shape [batch_size, Tv, dim]. The calculation follows the steps:
 
-- Calculate scores with shape [batch_size, Tq, Tv] as a query-key dot product: scores = tf.matmul(query, key, transpose_b=True).
-- Use scores to calculate a distribution with shape [batch_size, Tq, Tv]: distribution = tf.nn.softmax(scores).
-- Use distribution to create a linear combination of value with shape [batch_size, Tq, dim]: return tf.matmul(distribution, value).
+- Calculate scores with shape [batch_size, Tq, Tv] as a query-key dot product: `scores = tf.matmul(query, key, transpose_b=True)`.
+- Use scores to calculate a distribution with shape [batch_size, Tq, Tv]: `distribution = tf.nn.softmax(scores)`.
+- Use distribution to create a linear combination of value with shape [batch_size, Tq, dim]: `return tf.matmul(distribution, value)`.
 
 ### Usage notes:
 - Attention perform a query-key dot product, so each query and key should ideally have a sequence dimension. Otherwise the dot product will just produce 1 number (not very useful as a probability distribution!).
 - Therefore, make sure that your final RNN layer returns sequences.
+- If using the classic `Attention` layer, the resulting context vector needs to be collapsed back into a single sequence dimension (using `tf.reduce.sum` or `tf.reduce.mean` depending on your domain), before concatenating it with the target. This will ensure that the sequence dimensions are the same.
 
 
 Further Enhancements:
