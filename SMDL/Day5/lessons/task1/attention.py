@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
+# import the loss function
 sys.path.append(os.path.join('..', '..', '..', 'Day3', 'lessons'))
-from task1.encoder import MyEncoder
 from task3.loss_function import loss_function
 
 # source text
@@ -238,7 +238,7 @@ def predict(sentence: str):
         # __NEW__: save the encoder context for each step
         contexts.append(enc_context)
 
-    return result, contexts
+    return result, contexts, enc_out
 
 
 if __name__ == '__main__':
@@ -251,7 +251,7 @@ if __name__ == '__main__':
 
     # __NEW__: train a bit longer for Attention layer to settle
     # since we've now added more information to the decoder to decode
-    history = train(dataset, epochs=700, optimizer=Adam())
+    history = train(dataset, epochs=600, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
@@ -262,6 +262,12 @@ if __name__ == '__main__':
 
     for t in english_text:
         # __NEW__: get the contexts to visualise
-        prediction, contexts = predict(t)
+        prediction, contexts, encoded_input = predict(t)
+        print('=====================')
         print(t, '=>', prediction)
+
+        # __NEW__: compare the contexts with the encoded_input
+        # recall that the former is a dynamically weighted version
+        # of the latter! (dynamically == different per step)
+        print('\tencoded input:', encoded_input.numpy().sum(axis=1))  # collapse seq dim for easier comparison
         print('\tcontexts:', contexts)
