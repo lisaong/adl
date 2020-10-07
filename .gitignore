@@ -1,5 +1,7 @@
-.idea
 *.h5
+*.mp3
+*.mp4
 *.pkl
+.idea
 .ipynb_checkpoints
 __pycache__
