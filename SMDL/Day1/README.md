@@ -1,5 +1,8 @@
 ## Day 1: Sentiment Classification
 
+### Walkthrough video
+https://youtu.be/w4dj3MfjM-8
+
 ### Setup
 1. Install Python dependencies
    ```
