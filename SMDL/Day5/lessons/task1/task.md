@@ -22,10 +22,21 @@ The most basic Attention layer receives input in the form of query and key-value
 
 * The dynamic scores are then **applied to the value sequence using another weighted sum**. This yields a set of dynamically weighted values, where higher weightage at v[t] means more relevance (more "attention" is given). This is called the **context vector** and is concatenated with the input to the subsequent layers.
 
-Reference:
-* Neural Machine Translation with attention: https://www.tensorflow.org/tutorials/text/nmt_with_attention
+### Calculation
+
+Inputs are query tensor of shape [batch_size, Tq, dim], value tensor of shape [batch_size, Tv, dim] and key tensor of shape [batch_size, Tv, dim]. The calculation follows the steps:
+
+- Calculate scores with shape [batch_size, Tq, Tv] as a query-key dot product: scores = tf.matmul(query, key, transpose_b=True).
+- Use scores to calculate a distribution with shape [batch_size, Tq, Tv]: distribution = tf.nn.softmax(scores).
+- Use distribution to create a linear combination of value with shape [batch_size, Tq, dim]: return tf.matmul(distribution, value).
+
+### Usage notes:
+- Attention perform a query-key dot product, so each query and key should ideally have a sequence dimension. Otherwise the dot product will just produce 1 number (not very useful as a probability distribution!).
+- Therefore, make sure that your final RNN layer returns sequences.
+
 
 Further Enhancements:
+* Neural Machine Translation with (Bahdanau) attention: https://www.tensorflow.org/tutorials/text/nmt_with_attention
 * Self-attention: where key, value, and query 
 * Global vs. Local attention: https://nlp.stanford.edu/pubs/emnlp15_attn.pdf
 * Spatial vs. Temporal attention: https://www.groundai.com/project/where-and-when-to-look-spatio-temporal-attention-for-action-recognition-in-videos/1
