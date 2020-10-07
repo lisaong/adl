@@ -269,5 +269,7 @@ if __name__ == '__main__':
         # __NEW__: compare the contexts with the encoded_input
         # recall that the former is a dynamically weighted version
         # of the latter! (dynamically == different per step)
-        print('\tencoded input:', encoded_input.numpy().sum(axis=1))  # collapse seq dim for easier comparison
+
+        # collapse the encoded input in the sequence dim for comparison
+        print('\tencoded input:', encoded_input.numpy().sum(axis=1))
         print('\tcontexts:', contexts)
