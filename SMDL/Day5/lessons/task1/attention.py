@@ -107,7 +107,7 @@ class MyDecoderWithAttention(Model):
         # NEW: get the context vector (i.e. weighted encoded output) by applying attention
         # query: previous decoder hidden state, value: encoded source sequence
         context_vector = self.attention([hidden, enc_output])
-        # since we use return_sequences=True, need to then
+        # since we use return_sequences=True in encoder, need to then
         # collapse the middle dimension (sequence dim) back to 1
         context_vector = tf.reduce_sum(context_vector, axis=1)
 
