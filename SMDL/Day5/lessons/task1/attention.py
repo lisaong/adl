@@ -264,3 +264,4 @@ if __name__ == '__main__':
         # __NEW__: get the contexts to visualise
         prediction, contexts = predict(t)
         print(t, '=>', prediction)
+        print('\tcontexts:', contexts)
