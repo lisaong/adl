@@ -22,7 +22,8 @@ class MyDecoder(Model):
         self.batch_size = batch_size
         self.dec_units = dec_units
         self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
+        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True,
+                       recurrent_initializer='glorot_uniform')
         self.fc = Dense(vocab_size)
 
     def call(self, x, hidden, enc_output):

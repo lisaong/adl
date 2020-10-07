@@ -22,7 +22,8 @@ class MyEncoder(Model):
         self.batch_size = batch_size
         self.enc_units = enc_units
         self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.enc_units, return_state=True)
+        self.gru = GRU(self.enc_units, return_state=True,
+                       recurrent_initializer='glorot_uniform')
 
     def call(self, x, hidden):
         x = self.embedding(x)
