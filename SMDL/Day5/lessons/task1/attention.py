@@ -1,5 +1,6 @@
 # Demo of Attention Layer
 # A modified version of Day3/task4/training.py to add Attention to the Seq2Seq model
+# Look for sections marked __NEW__ to see the changes
 
 import tensorflow as tf
 from tensorflow.keras.layers.experimental.preprocessing import TextVectorization
@@ -100,11 +101,11 @@ class MyDecoderWithAttention(Model):
         self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
         self.fc = Dense(vocab_size)
 
-        # NEW: attention, increase dropout to reduce the effect of the weights
+        # __NEW__: attention, increase dropout to reduce the effect of the weights
         self.attention = Attention()
 
     def call(self, x, hidden, enc_output):
-        # NEW: get the context vector (i.e. weighted encoded output) by applying attention
+        # __NEW__: get the context vector (i.e. weighted encoded output) by applying attention
         # query: previous decoder hidden state, value: encoded source sequence
         context_vector = self.attention([hidden, enc_output])
         # since we use return_sequences=True in encoder, need to then
@@ -115,7 +116,7 @@ class MyDecoderWithAttention(Model):
         # x shape after passing through embedding == (batch_size, 1, embedding_dim)
         x = self.embedding(x)
 
-        # NEW: concat the context vector with the target (instead of the encoded output)
+        # __NEW__: concat the context vector with the target (instead of the encoded output)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
 
         # passing the concatenated vector to the GRU
@@ -206,7 +207,7 @@ def train(train_dataset, epochs, optimizer):
 def predict(sentence: str):
     result = ''
 
-    # NEW: store the attended encoder contexts so that we can visualise
+    # __NEW__: store the encoder contexts so that we can visualise
     # what attention focuses on at each sequence step
     contexts = []
 
@@ -234,7 +235,7 @@ def predict(sentence: str):
         # the predicted id and decoder hidden state is fed back into the model
         dec_input = tf.expand_dims([predicted_id], 0)
 
-        # NEW: save the encoder context for this step
+        # __NEW__: save the encoder context for each step
         contexts.append(enc_context)
 
     return result, contexts
@@ -248,7 +249,9 @@ if __name__ == '__main__':
         .batch(BATCH_SIZE) \
         .repeat(BATCHES_PER_EPOCH)
 
-    history = train(dataset, epochs=500, optimizer=Adam())
+    # __NEW__: train a bit longer for Attention layer to settle
+    # since we've now added more information to the decoder
+    history = train(dataset, epochs=1000, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
@@ -258,6 +261,6 @@ if __name__ == '__main__':
     plt.show()
 
     for t in english_text:
-        # NEW: get the contexts to visualise
+        # __NEW__: get the contexts to visualise
         prediction, contexts = predict(t)
         print(t, '=>', prediction)
