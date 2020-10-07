@@ -250,8 +250,8 @@ if __name__ == '__main__':
         .repeat(BATCHES_PER_EPOCH)
 
     # __NEW__: train a bit longer for Attention layer to settle
-    # since we've now added more information to the decoder
-    history = train(dataset, epochs=1000, optimizer=Adam())
+    # since we've now added more information to the decoder to decode
+    history = train(dataset, epochs=700, optimizer=Adam())
 
     plt.plot(history)
     plt.ylabel('loss')
