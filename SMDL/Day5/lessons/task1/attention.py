@@ -80,7 +80,7 @@ class MyDecoderWithAttention(Model):
 
     def call(self, x, hidden, enc_output):
         # NEW: get the context vector (i.e. weighted encoded output) by applying attention
-        # query: previous decoder hidden state, value: encoded input sequence
+        # query: previous decoder hidden state, value: encoded source sequence
         context_vector = self.attention([hidden, enc_output])
 
         # pass the target through the decoder
@@ -103,7 +103,7 @@ class MyDecoderWithAttention(Model):
         # output shape == (batch_size, vocab)
         x = self.fc(output)
 
-        return x, state
+        return x, state, context_vector
 
     def get_config(self):
         # to enable model saving as HDF5 format
@@ -134,7 +134,7 @@ def train_step(source, target, enc_hidden, optimizer):
         for t in range(1, target.shape[1]):
             # Loop through the target sequence,
             # passing enc_output to the decoder
-            predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_output)
+            predictions, dec_hidden, _ = decoder(dec_input, dec_hidden, enc_output)
             loss += loss_function(target[:, t], predictions)
 
             # Using teacher forcing by setting the decoder input to the next target
@@ -181,6 +181,10 @@ def train(train_dataset, epochs, optimizer):
 def predict(sentence: str):
     result = ''
 
+    # NEW: store the attended encoder contexts so that we can visualise
+    # what attention focuses on at each sequence step
+    contexts = []
+
     sentence = f'{START_TOKEN} {sentence} {END_TOKEN}'
     inputs = src_vectorizer([sentence])
     inputs = tf.convert_to_tensor(inputs)
@@ -194,7 +198,7 @@ def predict(sentence: str):
     max_target_sequence_length = 10
     for t in range(max_target_sequence_length):
         # get the predicted id for the next word
-        predictions, dec_hidden = decoder(dec_input, dec_hidden, enc_out)
+        predictions, dec_hidden, enc_context = decoder(dec_input, dec_hidden, enc_out)
         predicted_id = tf.argmax(predictions[-1]).numpy()
         result += tgt_vocab[predicted_id] + ' '
 
@@ -205,7 +209,10 @@ def predict(sentence: str):
         # the predicted id and decoder hidden state is fed back into the model
         dec_input = tf.expand_dims([predicted_id], 0)
 
-    return result
+        # NEW: save the encoder context for this step
+        contexts.append(enc_context)
+
+    return result, contexts
 
 
 if __name__ == '__main__':
@@ -226,4 +233,7 @@ if __name__ == '__main__':
     plt.show()
 
     for t in english_text:
-        print(t, '=>', predict(t))
+        # NEW: get the contexts to visualise
+        prediction, contexts = predict(t)
+        print(t, '=>', prediction)
+

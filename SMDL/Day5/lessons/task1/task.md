@@ -22,6 +22,9 @@ The most basic Attention layer receives input in the form of query and key-value
 
 * The dynamic scores are then **applied to the value sequence using another weighted sum**. This yields a set of dynamically weighted values, where higher weightage at v[t] means more relevance (more "attention" is given). This is called the **context vector** and is concatenated with the input to the subsequent layers.
 
+Reference:
+* Neural Machine Translation with attention: https://www.tensorflow.org/tutorials/text/nmt_with_attention
+
 Further Enhancements:
 * Self-attention: where key, value, and query 
 * Global vs. Local attention: https://nlp.stanford.edu/pubs/emnlp15_attn.pdf
