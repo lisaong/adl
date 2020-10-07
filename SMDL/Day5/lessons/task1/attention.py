@@ -60,9 +60,34 @@ print('Target Vocabulary', tgt_vocab)
 tgt_sequences = tgt_vectorizer(tgt_delimited)
 tgt_start_token_index = tgt_vocab.index(START_TOKEN)
 
-encoder = MyEncoder(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
-                    enc_units=BOTTLENECK_UNITS,
-                    batch_size=BATCH_SIZE)
+
+# Encoder from Day 3, modified to return sequences
+class MyEncoderSequences(Model):
+    def __init__(self, vocab_size, embedding_dim, enc_units, batch_size):
+        super(MyEncoderSequences, self).__init__()
+        self.vocab_size = vocab_size
+        self.batch_size = batch_size
+        self.enc_units = enc_units
+        self.embedding = Embedding(vocab_size, embedding_dim)
+        self.gru = GRU(self.enc_units, return_state=True, return_sequences=True)
+
+    def call(self, x, hidden):
+        x = self.embedding(x)
+        output, state = self.gru(x, initial_state=hidden)
+        return output, state
+
+    def initialize_hidden_state(self):
+        return tf.zeros((self.batch_size, self.enc_units))
+
+    def get_config(self):
+        # to enable model saving as HDF5 format
+        return {'batch_size': self.batch_size,
+                'enc_units': self.enc_units}
+
+
+encoder = MyEncoderSequences(len(src_vocab), embedding_dim=EMBEDDING_SIZE,
+                             enc_units=BOTTLENECK_UNITS,
+                             batch_size=BATCH_SIZE)
 
 
 # Decoder from Day3, modified with Attention
@@ -72,8 +97,7 @@ class MyDecoderWithAttention(Model):
         self.batch_size = batch_size
         self.dec_units = dec_units
         self.embedding = Embedding(vocab_size, embedding_dim)
-        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True,
-                       recurrent_initializer='glorot_uniform')
+        self.gru = GRU(self.dec_units, return_sequences=True, return_state=True)
         self.fc = Dense(vocab_size)
 
         # NEW: attention, increase dropout to reduce the effect of the weights
@@ -83,16 +107,16 @@ class MyDecoderWithAttention(Model):
         # NEW: get the context vector (i.e. weighted encoded output) by applying attention
         # query: previous decoder hidden state, value: encoded source sequence
         context_vector = self.attention([hidden, enc_output])
+        # since we use return_sequences=True, need to then
+        # collapse the middle dimension (sequence dim) back to 1
+        context_vector = tf.reduce_sum(context_vector, axis=1)
 
         # pass the target through the decoder
         # x shape after passing through embedding == (batch_size, 1, embedding_dim)
         x = self.embedding(x)
 
-        # NEW: concat the context vector with the encoded output and target
-        # (Optionally, you can exclude the encoded output)
-        x = tf.concat([tf.expand_dims(context_vector, 1),
-                       tf.expand_dims(enc_output, 1),  # optional
-                       x], axis=-1)
+        # NEW: concat the context vector with the target (instead of the encoded output)
+        x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
 
         # passing the concatenated vector to the GRU
         output, state = self.gru(x)
@@ -119,7 +143,7 @@ decoder = MyDecoderWithAttention(len(tgt_vocab), embedding_dim=EMBEDDING_SIZE,
 
 # https://www.tensorflow.org/api_docs/python/tf/function
 # Compile the function into a Tensorflow graph
-@tf.function
+# @tf.function
 def train_step(source, target, enc_hidden, optimizer):
     loss = 0
 
@@ -220,8 +244,8 @@ if __name__ == '__main__':
     # Create a batched dataset from our sequences
     BATCHES_PER_EPOCH = 5
     dataset = tf.data.Dataset.from_tensor_slices((src_sequences, tgt_sequences))
-    dataset = dataset.shuffle(1024)\
-        .batch(BATCH_SIZE)\
+    dataset = dataset.shuffle(1024) \
+        .batch(BATCH_SIZE) \
         .repeat(BATCHES_PER_EPOCH)
 
     history = train(dataset, epochs=500, optimizer=Adam())
@@ -237,4 +261,3 @@ if __name__ == '__main__':
         # NEW: get the contexts to visualise
         prediction, contexts = predict(t)
         print(t, '=>', prediction)
-
