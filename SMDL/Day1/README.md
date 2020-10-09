@@ -15,8 +15,14 @@ https://youtu.be/w4dj3MfjM-8
     # You must complete the _ANS_ portions so that you can train the model
     python train.py
    ```
-3. Run Flask app
+3. Create a file in `app/.flaskenv` that contains this:
    ```
+    FLASK_APP=run.py
+    FLASK_ENV=development
+    FLASK_RUN_PORT=8080
+   ```     
+   Run the flask app:
+   ```   
     cd app
     flask run
    ```

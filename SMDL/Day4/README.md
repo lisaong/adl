@@ -9,8 +9,14 @@
     python train.py
     ```
    
-2. Run Flask app
+2. Create a file in `app/.flaskenv` that contains this:
    ```
+    FLASK_APP=run.py
+    FLASK_ENV=development
+    FLASK_RUN_PORT=8080
+   ```     
+   Run the flask app:
+   ```   
     cd app
     flask run
    ```
