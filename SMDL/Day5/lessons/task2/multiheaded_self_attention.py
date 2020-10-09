@@ -4,6 +4,10 @@ import tensorflow as tf
 from tensorflow.keras.layers import Layer, Dense
 import numpy as np
 
+# You don't have to implement this from scratch, you can also use
+# keras.layers.MultiHeadAttention from Tensorflow Add-ons
+# https://www.tensorflow.org/addons
+# https://www.tensorflow.org/addons/api_docs/python/tfa/layers/MultiHeadAttention
 
 class MultiHeadSelfAttention(Layer):
     def __init__(self, embed_dim, num_heads=8):
@@ -20,7 +24,7 @@ class MultiHeadSelfAttention(Layer):
         self.query_dense = Dense(embed_dim)
         self.key_dense = Dense(embed_dim)
         self.value_dense = Dense(embed_dim)
-        self.combine_heads = Dense(embed_dim)
+        self.output_dense = Dense(embed_dim)
 
     def attention(self, query, key, value):
         score = tf.matmul(query, key, transpose_b=True)
@@ -38,39 +42,40 @@ class MultiHeadSelfAttention(Layer):
         # x.shape = [batch_size, seq_len, embedding_dim]
         batch_size = tf.shape(inputs)[0]
 
-        # Dense layer for query
+        # Query
+        # Dense layer to project and split embed_dim to num_heads*projection_dim
         query = self.query_dense(inputs)  # (batch_size, seq_len, embed_dim)
-        # reshape into num_heads heads
         query = self.separate_heads(
             query, batch_size
         )  # (batch_size, num_heads, seq_len, projection_dim)
 
-        # Dense layer for key
+        # Key
+        # Dense layer to project and split embed_dim to num_heads*projection_dim
         key = self.key_dense(inputs)  # (batch_size, seq_len, embed_dim)
-        # reshape into num_heads heads
         key = self.separate_heads(
             key, batch_size
         )  # (batch_size, num_heads, seq_len, projection_dim)
 
-        # Dense layer for value
+        # Value
+        # Dense layer to project and split embed_dim to num_heads*projection_dim
         value = self.value_dense(inputs)  # (batch_size, seq_len, embed_dim)
-        # reshape into num_heads heads
         value = self.separate_heads(
             value, batch_size
         )  # (batch_size, num_heads, seq_len, projection_dim)
 
         # Attention
-        attention, weights = self.attention(query, key, value)
+        attention, _ = self.attention(query, key, value)
         attention = tf.transpose(
             attention, perm=[0, 2, 1, 3]
         )  # (batch_size, seq_len, num_heads, projection_dim)
 
+        # Combine back to num_heads*projection_dim
         concat_attention = tf.reshape(
             attention, (batch_size, -1, self.embed_dim)
         )  # (batch_size, seq_len, embed_dim)
 
-        # Combine using another Dense layer
-        out = self.combine_heads(
+        # Apply a final Dense layer
+        out = self.output_dense(
             concat_attention
         )  # (batch_size, seq_len, embed_dim)
         return out

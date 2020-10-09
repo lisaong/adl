@@ -12,6 +12,8 @@ A Transformer consists of the following components:
   
   ![famous picture](https://www.tensorflow.org/images/tutorials/transformer/multi_head_attention.png)
 
+  ![internals](multiheaded_self_attention.png)
+
 References:
 - https://keras.io/examples/nlp/text_classification_with_transformer/
 - https://www.tensorflow.org/tutorials/text/transformer
