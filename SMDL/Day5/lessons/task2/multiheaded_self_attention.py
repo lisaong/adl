@@ -1,4 +1,5 @@
 # Transformer, in parts
+# Part 2: Multi-headed Self-attention
 
 import tensorflow as tf
 from tensorflow.keras.layers import Layer, Dense
@@ -8,6 +9,7 @@ import numpy as np
 # keras.layers.MultiHeadAttention from Tensorflow Add-ons
 # https://www.tensorflow.org/addons
 # https://www.tensorflow.org/addons/api_docs/python/tfa/layers/MultiHeadAttention
+
 
 class MultiHeadSelfAttention(Layer):
     def __init__(self, embed_dim, num_heads=8):

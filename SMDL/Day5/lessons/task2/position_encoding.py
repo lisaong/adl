@@ -1,4 +1,5 @@
 # Transformer, in parts
+# Part 1: Positional Encoding
 
 import tensorflow as tf
 from tensorflow.keras.layers import Layer, Embedding
