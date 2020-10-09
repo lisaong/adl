@@ -1,5 +1,7 @@
 type: theory
 custom_name: Transformer
 files:
-- name: main.py
+- name: position_embedding.py
+  visible: true
+- name: multiheaded_self_attention.py
   visible: true
