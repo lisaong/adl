@@ -1,0 +1,11 @@
+type: theory
+custom_name: Transformer
+files:
+- name: position_encoding.py
+  visible: true
+- name: multiheaded_self_attention.py
+  visible: true
+- name: multiheaded_self_attention.png
+  visible: true
+- name: transformer.py
+  visible: true
