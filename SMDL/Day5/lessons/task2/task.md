@@ -10,10 +10,11 @@ A Transformer consists of the following components:
   - Self-attention means the query-key and value are all on the **same** sequence (hence "self"). It allows learning of contextual information (attention) on the source sequence based on the words in the source sequence. In comparison, Vanilla Attention uses a target (i.e. a different) sequence to learn contextual information on the source sequence.
   - Multi-headed means multiple parallel self-attention blocks are used. Analogous to having more neurons in Dense layer or channels in a Convolution layer to train more weights in parallel.
   
-  ![famous picture](https://www.tensorflow.org/images/tutorials/transformer/multi_head_attention.png)
-
   ![internals](multiheaded_self_attention.png)
 
+- Transformer Encoder. `transformer.py` demonstrates the encoder portion of the Transformer model. The encoder can be used as a feature extractor for a sequence learning task, effectively as a drop-in replacement for RNNs.
+  ![transformer](https://www.tensorflow.org/images/tutorials/transformer/transformer.png)
+
 References:
-- https://keras.io/examples/nlp/text_classification_with_transformer/
-- https://www.tensorflow.org/tutorials/text/transformer
+- https://keras.io/examples/nlp/text_classification_with_transformer/: Basic Transformer block
+- https://www.tensorflow.org/tutorials/text/transformer: Application of Transformer in Encoder/Decoder.

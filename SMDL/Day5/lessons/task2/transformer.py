@@ -14,18 +14,18 @@ from position_encoding import TokenAndPositionEmbedding
 
 class TransformerBlock(Layer):
     def call(self, inputs, training):
-        attn_output = self.att(inputs)
+        attn_output = self.attention(inputs)
         attn_output = self.dropout1(attn_output, training=training)
-        out1 = self.layernorm1(inputs + attn_output)
+        context = self.layer_norm1(inputs + attn_output)
 
-        ffn_output = self.dense1(out1)
+        ffn_output = self.dense1(context)
         ffn_output = self.dense2(ffn_output)
         ffn_output = self.dropout2(ffn_output, training=training)
-        return self.layernorm2(out1 + ffn_output)
+        return self.layer_norm2(context + ffn_output)
 
     def __init__(self, embed_dim, num_heads, ff_dim, dropout_rate=0.1):
         super(TransformerBlock, self).__init__()
-        self.att = MultiHeadSelfAttention(embed_dim, num_heads)
+        self.attention = MultiHeadSelfAttention(embed_dim, num_heads)
 
         self.dense1 = Dense(ff_dim, activation='relu')
         self.dense2 = Dense(embed_dim)
@@ -35,8 +35,8 @@ class TransformerBlock(Layer):
         # so that the output values are zero-centered with unit variance
         # (this is to speed up training by keeping the outputs scaled down)
         # (epsilon is just a small number to avoid dividing by zero if variance is too small)
-        self.layernorm1 = LayerNormalization(epsilon=1e-6)
-        self.layernorm2 = LayerNormalization(epsilon=1e-6)
+        self.layer_norm1 = LayerNormalization(epsilon=1e-6)
+        self.layer_norm2 = LayerNormalization(epsilon=1e-6)
         self.dropout1 = Dropout(dropout_rate)
         self.dropout2 = Dropout(dropout_rate)
 
@@ -44,12 +44,12 @@ class TransformerBlock(Layer):
 def create_model(sequence_len, vocab_size, embed_dim, num_heads):
     model_input = Input(shape=(sequence_len,))
 
-    # Transformer
+    # Transformer (a sequence feature learner to replace RNN)
     x = TokenAndPositionEmbedding(sequence_len,
                                   vocab_size, embed_dim)(model_input)
     x = TransformerBlock(embed_dim, num_heads, ff_dim=2)(x)
 
-    # MLP
+    # MLP classifier
     x = GlobalAveragePooling1D()(x)
     x = Dense(4, activation="relu")(x)
     x = Dense(1, activation="sigmoid")(x)
