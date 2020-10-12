@@ -6,9 +6,9 @@ A Transformer consists of the following components:
 
 ### Positional Encoding
 
-This is a way to encode sequence information without using a recurrent cell. We essentially pass the position indices (e.g. `[0, 1, 2, ...]`) as an extra input. Think of this like a cross-sectional approach where we pass in `[(0, token1), (1, token2), ....]` instead of `[token1, token 2, ...]`. An Embedding layer produces the encoding into vectors.
+This is a way to encode sequence information without using a recurrent cell. We essentially pass the position indices (e.g. `[0, 1, 2, ...]`) as an extra input. Think of this like a cross-sectional approach where we pass in `[(0, token1), (1, token2), ....]` instead of `[token1, token 2, ...]`.
 
-Conceptually, once we have a position encoding (as a vector), we can compute similarity, compare relative positions of a token in different samples, etc.
+An Embedding layer produces the encoding into vectors. It is common to initialize the Embedding layer with a sinusoidal encoding. More details are described in [positional_encoding.md](positional_encoding.md)
 
 The position encoding is **added** to the token encoding, to create the combined (position, token) encoding. You can think of it as different "biases" to the token encoding, to indicate where the token is located in the sequence.
 
