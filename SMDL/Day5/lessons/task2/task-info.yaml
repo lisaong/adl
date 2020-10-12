@@ -13,3 +13,5 @@ files:
   visible: true
 - name: positional_encoding.md
   visible: true
+- name: token_n_position_embedding.png
+  visible: true
