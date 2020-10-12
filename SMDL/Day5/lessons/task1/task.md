@@ -35,6 +35,15 @@ Inputs are query tensor of shape [batch_size, Tq, dim], value tensor of shape [b
 - Therefore, make sure that your final RNN layer returns sequences.
 - If using the classic `Attention` layer, the resulting context vector needs to be collapsed back into a single sequence dimension (using `tf.reduce.sum` or `tf.reduce.mean` depending on your domain), before concatenating it with the target. This will ensure that the sequence dimensions are the same.
 
+### Application in Encoder-Decoder
+
+![architecture](architecture.png)
+
+- The Attention layer is applied at the Decoder.
+- The Encoder is changed to return sequences. The sequences will be used as the value (and key) to the Attention layer.
+- The Decoder's hidden state is the query. The initial hidden state will be set to the Encoder's output hidden state (same as vanilla Seq2Seq Encoder-Decoder)
+- The Attention layer produces a context vector, which is a dynamically weighted combination of the Encoded sequence, summed together.
+- The context vector is passed along to the LSTM or GRU (concatenated with the previous target token's embedding). Previously, in a vanilla Seq2Seq, the last encoded output was provided. *This way, the context vector can hold richer information that takes into account the **entire** Encoder sequence, rather than just the final value of the Encoder sequence.*
 
 Further Enhancements:
 * Neural Machine Translation with (Bahdanau) attention: https://www.tensorflow.org/tutorials/text/nmt_with_attention
