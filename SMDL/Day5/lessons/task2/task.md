@@ -22,14 +22,20 @@ The position embedding is **added** to the token embedding, to create the combin
   
 ![internals](multiheaded_self_attention.png)
 
-### Putting it Together: Transformer Encoder
+## Putting it Together
+
+This is the architecture described in the famous [Attention is All You Need](https://arxiv.org/abs/1706.03762) paper.
+
+Note that while the paper describes an Encoder-Decoder model, Transformers can be used in non-encoder-decoder models as well, such as [text classification](https://keras.io/examples/nlp/text_classification_with_transformer/). They are essentially a replacement for LSTMs and GRUs.
+
+### (1/2): Transformer Encoder
 
 `transformer.py` demonstrates the encoder portion of the Transformer model. The encoder can be used as a feature extractor for a sequence learning task, effectively as a drop-in replacement for RNNs.
 
-The Encoder architecture is depicted in the left-hand side of this model (Decoder is described in the next section):
+The Encoder architecture is depicted in the left-hand side of this model (Decoder is described in the next section).
 ![transformer](https://www.tensorflow.org/images/tutorials/transformer/transformer.png)
 
-### Putting it Together: Transformer Decoder
+### (2/2): Transformer Decoder
 
 The Decoder is made up of similar building blocks as the encoder. It has a Transformer Block with two multi-headed self-attention layers.
 - Positional-encoding is applied to the current target sequence, then fed into 1 layer of  multi-headed self-attention.
