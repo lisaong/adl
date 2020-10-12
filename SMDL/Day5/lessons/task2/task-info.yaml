@@ -9,3 +9,9 @@ files:
   visible: true
 - name: transformer.py
   visible: true
+- name: sinusoidal_formula.png
+  visible: true
+- name: positional_encoding.md
+  visible: true
+- name: token_n_position_embedding.png
+  visible: true

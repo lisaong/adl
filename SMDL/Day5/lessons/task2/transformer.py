@@ -110,7 +110,14 @@ if __name__ == "__main__":
     model.summary()
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['acc'])
-    model.fit(X, y, epochs=10, batch_size=2)
+    model.fit(X, y, epochs=30, batch_size=2)
 
-    pred = model.predict(vectorizer(['achieve my goals']))
-    print(pred)
+    test = [['achieve my goals'], ['transformers are fun']]
+    pred = model.predict(vectorizer(test))
+
+    # pred is a 2D column vector, so we flatten it to a 1D vector
+    # np.round will round the probabilities to the nearest whole number
+    # label encoder only accepts integers, so we need .astype(int) to convert floats to ints
+    pred_classes = le.inverse_transform(np.round(pred.flatten()).astype(int))
+    print(test)
+    print(pred_classes)
