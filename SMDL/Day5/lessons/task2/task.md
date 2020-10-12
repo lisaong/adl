@@ -26,8 +26,16 @@ The position embedding is **added** to the token embedding, to create the combin
 
 `transformer.py` demonstrates the encoder portion of the Transformer model. The encoder can be used as a feature extractor for a sequence learning task, effectively as a drop-in replacement for RNNs.
 
-The Encoder architecture is depicted in the left-hand side of this model:
+The Encoder architecture is depicted in the left-hand side of this model (Decoder is described in the next section):
 ![transformer](https://www.tensorflow.org/images/tutorials/transformer/transformer.png)
+
+### Putting it Together: Transformer Decoder
+
+The Decoder is made up of similar building blocks as the encoder. It has a Transformer Block with two multi-headed self-attention layers.
+- Positional-encoding is applied to the current target sequence, then fed into 1 layer of  multi-headed self-attention.
+- The output from the first layer is combined with the encoder output, into the 2nd multi-headed self-attention layer, etc.
+- Finally, the output from the Decoder Transformer Block is passed through an MLP classifier to predict the next target token.
+
 
 ### References
 - https://keras.io/examples/nlp/text_classification_with_transformer/: Basic Transformer block
