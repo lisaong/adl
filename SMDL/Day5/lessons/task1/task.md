@@ -5,7 +5,7 @@ learn which inputs are "most relevant" in the decisions made by an artificial ne
 
 Attention layers were introduced in 2015 (for Neural Machine Translation), but the general principle can apply to sequence-to-sequence models. 
 
-Attention (a variant called multi-headed attention) is also the main element in Transformers. Transformers are tipped to be the successors to RNNs for sequential learning. We will cover an example of a Transformer in the next task.
+Attention (a variant called multi-headed self-attention!) is also the main element in Transformers. Transformers are tipped to be the successors to RNNs for sequential learning. We will cover an example of a Transformer in the next task.
 
 The most basic Attention layer receives input in the form of query and key-value pairs:
 
@@ -14,7 +14,7 @@ The most basic Attention layer receives input in the form of query and key-value
 |Neural Machine Translation|target sequence|source sequence|source sequence|
 |Recommendation System|target items|user profile|user purchase history|
 
-* Notice that the query is referring to the **target**. This is because in Attention, we are trying to learn the relevance of sequential inputs (represented by key-value) on the sequential prediction (represented by the query). 
+* Notice that the query is referring to the **target** and the both the key and value refer to the **source**. This is because in Attention, we are trying to learn the relevance of sequential inputs (represented by key-value) on the sequential prediction (represented by the query). 
 
 * Attention is just a generic framework to learn dynamic scores on sequential inputs, so the concept of keys are included to allow for extraneous (possibly non-sequential) descriptive information on the inputs. In most cases, where there is no extraneous information about the sequential inputs, then key == value (the case for Neural Machine Translation).
 
