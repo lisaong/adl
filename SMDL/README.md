@@ -1,4 +1,4 @@
-# SMDL Workshop Setup
+# Sequence Modeling with Deep Learning Lessons and Workshops
 For this course we will be using PyCharm as the Integrated Development Environment (IDE).
 
 1. Download and install Anaconda for Python 3.8: https://www.anaconda.com/products/individual
@@ -16,6 +16,9 @@ For this course we will be using PyCharm as the Integrated Development Environme
 * Debugging a Flask app: https://youtu.be/ahlBohYUMq4
 
 ## Modules
+Each module contains lessons to cover the building blocks, under the `lessons` folder. 
+After going through the lessons, you can then apply the building blocks to train the model in the `train` folder, and call the trained model from a flask application in the `app` folder. Refer to the README.md files in each day's lessons.
+
 * Day 1: Sentiment Classification: https://github.com/lisaong/adl/tree/master/SMDL/Day1
 * Day 2: Chat Reply Generation: https://github.com/lisaong/adl/tree/master/SMDL/Day2
 * Day 3: Neural Machine Translation: https://github.com/lisaong/adl/tree/master/SMDL/Day3
