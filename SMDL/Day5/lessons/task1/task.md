@@ -14,7 +14,7 @@ The most basic Attention layer receives input in the form of query and key-value
 |Neural Machine Translation|target sequence|source sequence|source sequence|
 |Recommendation System|target items|user profile|user purchase history|
 
-* Notice that the query is referring to the **target** and the both the key and value refer to the **source**. This is because in Attention, we are trying to learn the relevance of sequential inputs (represented by key-value) on the sequential prediction (represented by the query). 
+* Notice that the query is referring to the **target**; while both the key and value refer to the **source**. This is backwards of how we usually think of queries, keys and values. The reason is that in Attention, we are trying to learn the relevance of sequential sources (represented by key-value) on predicting the sequential targets (represented by the query). 
 
 * Attention is just a generic framework to learn dynamic scores on sequential inputs, so the concept of keys are included to allow for extraneous (possibly non-sequential) descriptive information on the inputs. In most cases, where there is no extraneous information about the sequential inputs, then key == value (the case for Neural Machine Translation).
 
