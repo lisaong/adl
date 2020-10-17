@@ -1,8 +1,10 @@
 Day1/app/demo/model/lstm.h5
 Day1/app/demo/model/model_artifacts.pkl
 Day1/data/get_data.ipynb
+Day1/train/train_solution_ws1.py
 Day2/app/demo/model/gru.h5
 Day2/app/demo/model/model_artifacts.pkl
+Day2/train/train_solution_ws2.py
 Day3/app/demo/model/decoder_weights_e500.h5
 Day3/app/demo/model/encoder_weights_e500.h5
 Day3/app/demo/model/model_artifacts.pkl
@@ -11,10 +13,11 @@ Day3/lessons/task4/decoder_weights.h5
 Day3/lessons/task4/encoder_weights.h5
 Day3/lessons/task4/model_artifacts.pkl
 Day3/train/learning_curve.png
+Day3/train/train_solution_ws3.py
 Day4/app/demo/model/model_artifacts.pkl
 Day4/app/demo/model/td_cnn_rnn.h5
 Day4/lessons/task2/X.npy
 Day4/lessons/task2/y.npy
 Day4/lessons/task3/td_cnn_rnn.h5
 Day4/train/learning_curve.png
-Day4/train/train_solution.py
+Day4/train/train_solution_ws4.py

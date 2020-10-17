@@ -59,16 +59,19 @@ if __name__ == "__main__":
     # split to train and test
     X_train, X_val, y_train, y_val = train_test_split(X, y_cat, stratify=y)
 
+    # TODO: create a batched tf.data.Dataset for training
     # create batched training dataset
     batch_size = 32
     batches_per_epoch = 10
     train_ds = tf.data.Dataset.from_tensor_slices((X_train, y_train)). \
         batch(batch_size).repeat(batches_per_epoch)
 
+    # TODO: create model, using the create_model helper function (see td_cnn_rnn.py)
     # create model
     height, width, channels = X.shape[2], X.shape[3], X.shape[4]
     model = create_model(height, width, channels, 8, num_classes)
 
+    # TODO: train model and plot learning curve
     # train model
     model_path = os.path.join(MODEL_DIR, 'td_cnn_rnn.h5')
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
