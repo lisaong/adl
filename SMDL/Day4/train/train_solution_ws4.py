@@ -96,7 +96,7 @@ if __name__ == "__main__":
                     'image_size': image_size})
 
     # copy dataset pre-processing code
-    copyfile('make_dataset.py', os.path.join(model_path, 'make_dataset.py'))
+    copyfile('make_dataset.py', os.path.join(MODEL_DIR, 'make_dataset.py'))
 
     # metrics
     best_model = load_model(model_path)
