@@ -24,7 +24,7 @@
 
 The example below is after training for 500 epochs.
 
-![example](example.png)
+![example](example1.png)
 
 Possible meaning?
 
